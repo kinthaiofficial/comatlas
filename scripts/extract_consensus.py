@@ -13,6 +13,7 @@ if str(_ROOT) not in sys.path:
 from scripts.extract import anchor_claude, leg_xbrl
 from scripts.normalize import normalize_surface
 from scripts.consensus import score_m1
+from scripts.ontology import load_predicates, edge_satisfies_ontology
 from scripts import update_content
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -54,7 +55,16 @@ def process_source(raw: dict, today: str) -> None:
     edges += [normalize_triple(t) for t in anchor_claude.extract_source(raw)]
     for e in edges:
         e["confidence"] = score_m1(e)
-    update_content.apply(CONTENT, edges=edges, facts=facts, today=today,
+    predicates = load_predicates()
+    valid_edges = []
+    for e in edges:
+        ok, reason = edge_satisfies_ontology(e, predicates)
+        if ok:
+            valid_edges.append(e)
+        else:
+            print(f"DROP {e['subject']} {e['predicate']} {e['target']}: {reason}",
+                  file=sys.stderr)
+    update_content.apply(CONTENT, edges=valid_edges, facts=facts, today=today,
                          source_meta={"id": raw["source_id"], "kind": "sec-filing",
                                       "title": f"NVIDIA {raw['form']} {raw['filing_date']}",
                                       "url": raw["url"], "date": raw["filing_date"],

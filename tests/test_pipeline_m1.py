@@ -2,6 +2,7 @@
 import json
 import pytest
 from scripts import extract_consensus as pipe
+from scripts.lint_frontmatter import lint_dir
 
 RAW = {"source_id": "nvda-10k-2026-02-26", "form": "10-K", "url": "https://x",
        "accession": "0001-26-1", "filing_date": "2026-02-26", "as_of": "2026-Q1",
@@ -145,3 +146,51 @@ def test_crashing_source_isolated(tmp_path, monkeypatch):
     state = json.loads((tmp_path / "raw" / "_state.json").read_text())
     assert state[sid_good]["processed"] is True
     assert state[sid_bad]["processed"] is False
+
+
+def test_domain_violating_edge_dropped(tmp_path, monkeypatch):
+    """Anchor returns one valid triple + one domain-violating triple.
+    Only the valid one must reach content/, and lint must pass.
+    """
+    raw_dir = tmp_path / "raw" / "sec"
+    raw_dir.mkdir(parents=True)
+    raw_dir.joinpath("nvda-10k-2026-02-26.json").write_text(json.dumps(RAW))
+    (tmp_path / "raw" / "_state.json").write_text(json.dumps(
+        {"nvda-10k-2026-02-26": {"accession": "0001-26-1", "processed": False}}))
+    monkeypatch.setattr(pipe, "RAW", tmp_path / "raw")
+    monkeypatch.setattr(pipe, "CONTENT", tmp_path / "content")
+    monkeypatch.setattr(pipe.leg_xbrl, "extract", lambda raw: ([], []))
+
+    # One valid edge (Company COMPETES_WITH Company) + one domain violation
+    # (Technology IN_SEGMENT Segment — Technology not in IN_SEGMENT domain)
+    mixed_triples = [
+        {"subject": "NVIDIA", "subject_type": "Company", "predicate": "COMPETES_WITH",
+         "object": "Advanced Micro Devices", "object_type": "Company",
+         "evidence": "NVIDIA competes with AMD.", "as_of": "2026-Q1",
+         "source": "nvda-10k-2026-02-26", "extractor": "claude"},
+        {"subject": "NVLink", "subject_type": "Technology", "predicate": "IN_SEGMENT",
+         "object": "Data Center", "object_type": "Segment",
+         "evidence": "NVLink belongs to the Data Center segment.",
+         "as_of": "2026-Q1", "source": "nvda-10k-2026-02-26", "extractor": "claude"},
+    ]
+    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None: mixed_triples)
+
+    done = pipe.run(today="2026-06-07")
+    assert done == ["nvda-10k-2026-02-26"]
+
+    import frontmatter
+    nv = frontmatter.load(tmp_path / "content" / "entities" / "nvidia.md")
+    pred_targets = [(r["predicate"], r["target"]) for r in nv["relations"]]
+    assert ("COMPETES_WITH", "amd") in pred_targets       # valid edge kept
+
+    # Domain-violating edge must NOT appear in any entity page
+    nvlink_path = tmp_path / "content" / "entities" / "nvlink.md"
+    if nvlink_path.exists():
+        nvlink_page = frontmatter.load(nvlink_path)
+        for r in nvlink_page.get("relations") or []:
+            assert not (r["predicate"] == "IN_SEGMENT"), \
+                "Domain-violating IN_SEGMENT edge must not be written to content/"
+
+    # Lint must pass
+    errors = lint_dir(tmp_path / "content")
+    assert errors == [], f"Lint errors: {errors}"
