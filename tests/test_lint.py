@@ -62,3 +62,50 @@ def test_domain_violation_rejected(tmp_path):
     # Person cannot SUPPLIES (domain is Company/Fab)
     errs = lint_dir(setup(tmp_path, page(REL_OK).replace("type: Company", "type: Person")))
     assert any("domain" in e for e in errs)
+
+FACTS_OK = """\
+facts:
+  - metric: revenue
+    value: 1000
+    period: 2025-Q4
+    source: src-1
+    confidence: high
+    extractors: [claude]
+"""
+
+def test_facts_bad_confidence(tmp_path):
+    bad = FACTS_OK.replace("confidence: high", "confidence: uncertain")
+    errs = lint_dir(setup(tmp_path, page(REL_OK, extra=bad)))
+    assert any("bad confidence" in e for e in errs)
+
+def test_facts_missing_period(tmp_path):
+    # Remove the period line
+    bad = "\n".join(l for l in FACTS_OK.splitlines() if "period:" not in l) + "\n"
+    errs = lint_dir(setup(tmp_path, page(REL_OK, extra=bad)))
+    assert any("missing" in e for e in errs)
+
+def test_relation_range_violation(tmp_path):
+    # nvidia is type Company; SUPPLIES range is [Company] — use a Chip target instead
+    chip_page = page().replace("acme", "mycpu").replace("Acme", "MyCPU").replace("type: Company", "type: Chip")
+    write(tmp_path, "content/entities/mycpu.md", chip_page)
+    bad_rel = REL_OK.replace("target: nvidia", "target: mycpu")
+    errs = lint_dir(setup(tmp_path, page(bad_rel)))
+    assert any("range" in e for e in errs)
+
+def test_relation_bad_confidence(tmp_path):
+    bad_rel = REL_OK.replace("confidence: medium", "confidence: maybe")
+    errs = lint_dir(setup(tmp_path, page(bad_rel)))
+    assert any("bad confidence" in e for e in errs)
+
+def test_source_missing_url(tmp_path):
+    bad_src = GOOD_SOURCE.replace("url: https://x\n", "")
+    write(tmp_path, "content/sources/src-1.md", bad_src)
+    write(tmp_path, "content/entities/nvidia.md", page().replace("acme", "nvidia").replace("Acme", "NVIDIA"))
+    write(tmp_path, "content/entities/acme.md", page(REL_OK))
+    errs = lint_dir(tmp_path / "content")
+    assert any("sources/" in e for e in errs)
+
+def test_lint_dir_no_entities_subdir(tmp_path):
+    # A tmp dir without entities/ should return [] without crashing
+    errs = lint_dir(tmp_path)
+    assert errs == []

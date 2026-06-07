@@ -59,8 +59,12 @@ def lint_dir(content: Path) -> list[str]:
                 e(f"{w}: target type {tgt.metadata.get('type')} violates range({r['predicate']})")
         for i, f in enumerate(m.get("facts") or []):
             missing = FACT_REQUIRED - set(f)
-            if missing: errors.append(f"{pid}: facts[{i}]: missing {sorted(missing)}")
-            elif f["source"] not in sources:
+            if missing:
+                errors.append(f"{pid}: facts[{i}]: missing {sorted(missing)}")
+                continue
+            if f["confidence"] not in CONF:
+                errors.append(f"{pid}: facts[{i}]: bad confidence")
+            if f["source"] not in sources:
                 errors.append(f"{pid}: facts[{i}]: source '{f['source']}' has no source page")
     return errors
 
