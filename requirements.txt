@@ -1,0 +1,7 @@
+anthropic>=0.40
+edgartools>=3.0
+python-frontmatter>=1.1
+PyYAML>=6.0
+rapidfuzz>=3.0
+requests>=2.31
+pytest>=8.0

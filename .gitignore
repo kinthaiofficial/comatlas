@@ -1,0 +1,17 @@
+.DS_Store
+.gitignore
+node_modules
+public
+prof
+tsconfig.tsbuildinfo
+.obsidian
+.quartz-cache
+private/
+.replit
+replit.nix
+.quartz/plugins/*/
+quartz/cli/tui/dist/
+
+# Python
+.venv/
+__pycache__/
