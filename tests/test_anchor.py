@@ -37,6 +37,17 @@ def test_invalid_output_retried_once_then_raises():
         anchor_claude.extract_source(raw, runner=bad_runner)
     assert len(calls) == 2                      # one retry with the error fed back
 
+def test_filer_name_injected_into_prompt():
+    captured = []
+    def capturing_runner(prompt, model="sonnet"):
+        captured.append(prompt)
+        return FIX
+    raw = {"source_id": "nvda-10k-2026-02-26", "as_of": "2026-Q1", "filer": "NVIDIA",
+           "sections": {"Item 1": "We manufacture GPUs."}}
+    anchor_claude.extract_source(raw, runner=capturing_runner)
+    assert captured, "runner was never called"
+    assert "filing by NVIDIA" in captured[0], f"filer line not found in prompt: {captured[0][:300]}"
+
 def test_schema_violation_rejected():
     rogue = json.dumps({"triples": [{"subject": "X", "subject_type": "Startup",
         "predicate": "ACQUIRED", "object": "Y", "object_type": "Company",

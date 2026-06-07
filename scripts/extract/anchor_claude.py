@@ -34,8 +34,11 @@ def triples_schema() -> dict:
 
 def claude_runner(prompt: str, model: str = MODEL) -> str:
     """Headless Claude Code call (subscription auth; in Actions via CLAUDE_CODE_OAUTH_TOKEN)."""
-    r = subprocess.run(["claude", "-p", "--model", model, "--output-format", "json"],
-                       input=prompt, capture_output=True, text=True, timeout=900)
+    try:
+        r = subprocess.run(["claude", "-p", "--model", model, "--output-format", "json"],
+                           input=prompt, capture_output=True, text=True, timeout=900)
+    except subprocess.TimeoutExpired:
+        raise ExtractionError("claude CLI timed out after 900s")
     if r.returncode != 0:
         raise ExtractionError(f"claude CLI failed: {r.stderr[:500]}")
     return json.loads(r.stdout)["result"]
@@ -64,8 +67,11 @@ def _validate(data: dict) -> list[dict]:
                 raise ValueError(f"bad field {k}: {t}")
     return triples
 
-def extract_chunk(runner, chunk: str, as_of_hint: str) -> list[dict]:
-    prompt = (f"{RULES}\n{JSON_ONLY}\n\nJSON schema:\n{json.dumps(triples_schema())}\n\n"
+def extract_chunk(runner, chunk: str, as_of_hint: str, filer: str = "") -> list[dict]:
+    filer_line = (f'The text is from a filing by {filer}. Resolve first-person references '
+                  f'("we", "our", "the Company", "the reporting company") to "{filer}".\n'
+                  if filer else "")
+    prompt = (f"{RULES}\n{filer_line}{JSON_ONLY}\n\nJSON schema:\n{json.dumps(triples_schema())}\n\n"
               f"as_of hint: {as_of_hint}\n<text>\n{chunk}\n</text>")
     out = runner(prompt)
     try:
@@ -79,12 +85,13 @@ def extract_chunk(runner, chunk: str, as_of_hint: str) -> list[dict]:
 
 def extract_source(raw: dict, runner=None) -> list[dict]:
     runner = runner or claude_runner
+    filer = raw.get("filer", "NVIDIA")
     out = []
     for section, text in raw["sections"].items():
         for chunk in _chunks(text or ""):
             if not chunk.strip():
                 continue
-            for t in extract_chunk(runner, chunk, raw["as_of"]):
+            for t in extract_chunk(runner, chunk, raw["as_of"], filer):
                 out.append({**t, "source": raw["source_id"], "extractor": "claude",
                             "section": section})
     return out
