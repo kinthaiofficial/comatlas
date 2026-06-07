@@ -16,3 +16,6 @@ def test_unknown_surface_slugified_not_known():
 
 def test_slugify():
     assert slugify("SK hynix Inc.") == "sk-hynix-inc"
+
+def test_empty_surface_sane():
+    assert normalize_surface("", AMAP) == ("", False)

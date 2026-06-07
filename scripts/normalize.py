@@ -22,9 +22,9 @@ def _candidates(surface: str):
 
 def normalize_surface(surface: str, alias_map: dict | None = None) -> tuple[str, bool]:
     amap = alias_map if alias_map is not None else load_alias_map()
-    for cand in _candidates(surface):
+    cands = list(_candidates(surface))
+    for cand in cands:
         cid = amap.get(cand.casefold())
-        if cid:
+        if cid is not None:
             return cid, True
-    stripped = list(_candidates(surface))[-1]
-    return slugify(stripped), False
+    return slugify(cands[-1]), False
