@@ -29,12 +29,12 @@ export function buildGraph(pages) {
   const edges = [];
   for (const p of published.values()) {
     for (const r of p.relations ?? []) {
-      if (r.confidence === "low" || !published.has(r.target)) continue;
+      if (!["medium", "high"].includes(r.confidence) || !published.has(r.target)) continue;
       edges.push({
         source: p.id,
         target: r.target,
         predicate: r.predicate,
-        as_of: String(r.as_of),
+        as_of: r.as_of != null ? String(r.as_of) : null,
         valid_from: r.valid_from ?? null,
         valid_to: r.valid_to ?? null,
         confidence: r.confidence,
