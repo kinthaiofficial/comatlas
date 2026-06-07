@@ -36,7 +36,8 @@ def claude_runner(prompt: str, model: str = MODEL) -> str:
     """Headless Claude Code call (subscription auth; in Actions via CLAUDE_CODE_OAUTH_TOKEN)."""
     try:
         r = subprocess.run(["claude", "-p", "--model", model, "--output-format", "json"],
-                           input=prompt, capture_output=True, text=True, timeout=900)
+                           input=prompt, capture_output=True, text=True, timeout=900,
+                           cwd="/tmp")  # run outside project dir so CLAUDE.md hooks don't fire
     except subprocess.TimeoutExpired:
         raise ExtractionError("claude CLI timed out after 900s")
     if r.returncode != 0:

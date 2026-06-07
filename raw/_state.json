@@ -1,26 +1,26 @@
 {
   "nvda-10k-2026-02-25": {
     "accession": "0001045810-26-000021",
-    "processed": false
+    "processed": true
   },
   "nvda-10q-2026-05-20": {
     "accession": "0001045810-26-000052",
-    "processed": false
+    "processed": true
   },
   "nvda-8k-2026-03-06": {
     "accession": "0001045810-26-000024",
-    "processed": false
+    "processed": true
   },
   "nvda-8k-2026-04-27": {
     "accession": "0001045810-26-000026",
-    "processed": false
+    "processed": true
   },
   "nvda-8k-2026-05-08": {
     "accession": "0001045810-26-000028",
-    "processed": false
+    "processed": true
   },
   "nvda-8k-2026-05-20": {
     "accession": "0001045810-26-000051",
-    "processed": false
+    "processed": true
   }
 }
