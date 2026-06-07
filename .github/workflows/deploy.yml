@@ -1,0 +1,40 @@
+name: deploy
+on:
+  push: { branches: [main] }
+  workflow_dispatch: {}
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - run: python scripts/lint_frontmatter.py
+      - run: pytest -q
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: node --test tests/web/*.test.mjs
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx quartz build
+      - run: node scripts/build_graph.js public/graph/graph.json
+      - run: cp -r web/graph/. public/graph/
+      - run: test -f public/CNAME && cat public/CNAME
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: public }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "https://comatlas.kinthai.ai" }
+    steps:
+      - uses: actions/deploy-pages@v4
