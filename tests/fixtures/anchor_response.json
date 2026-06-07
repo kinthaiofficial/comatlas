@@ -1,0 +1,3 @@
+{"triples": [{"subject": "NVIDIA", "subject_type": "Company", "predicate": "MANUFACTURED_BY",
+  "object": "TSMC", "object_type": "Fab",
+  "evidence": "NVIDIA relies on TSMC to manufacture its GPUs.", "as_of": "2026-Q1"}]}
