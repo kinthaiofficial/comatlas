@@ -1,0 +1,11 @@
+# CLOSED SET — humans only. domain/range enforced by lint_frontmatter.py.
+# HEADQUARTERED_IN is RESERVED (disabled): no Place entity type exists yet (decision G9).
+predicates:
+  SUPPLIES:        {domain: [Company, Fab], range: [Company], inverse: CUSTOMER_OF, glirel_label: "supplies to"}
+  CUSTOMER_OF:     {domain: [Company], range: [Company, Fab], inverse: SUPPLIES, glirel_label: "is a customer of"}
+  COMPETES_WITH:   {domain: [Company, Product, Chip], range: [Company, Product, Chip], symmetric: true, glirel_label: "competes with"}
+  MANUFACTURED_BY: {domain: [Product, Chip, Company], range: [Fab, Company], functional_for: [Chip], glirel_label: "is manufactured by"}
+  OWNS_STAKE_IN:   {domain: [Company, Person], range: [Company], glirel_label: "owns a stake in"}
+  SUBSIDIARY_OF:   {domain: [Company], range: [Company], functional: true, glirel_label: "is a subsidiary of"}
+  PARTNER_WITH:    {domain: [Company], range: [Company], symmetric: true, glirel_label: "partners with"}
+  IN_SEGMENT:      {domain: [Segment, Product, Chip], range: [Company, Segment], glirel_label: "belongs to business segment"}

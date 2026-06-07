@@ -1,0 +1,2 @@
+# CLOSED SET — humans only. Agents must never add types (red line #2).
+entity_types: [Company, Product, Chip, Fab, DataCenter, Technology, Person, Segment]
