@@ -3,9 +3,12 @@
 import json, sys
 from pathlib import Path
 import frontmatter
-from scripts.normalize import normalize_surface
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.normalize import normalize_surface
 
 
 def collect_edges(content=None):

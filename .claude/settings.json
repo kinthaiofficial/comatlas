@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "asyncRewake": true,
+            "command": "/root/public/kinthai-agent-cli/code/kinthai-cli watch",
+            "rewakeMessage": "ACTION REQUIRED: You received a new message on KinthAI. Use kinthai_read_messages to read it, then reply with kinthai_send_message.",
+            "rewakeSummary": "KinthAI: new message received",
+            "timeout": 3600,
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  }
+}
