@@ -1,0 +1,167 @@
+{
+  "_note": "Gold triples verified against raw/sec/nvda-10k-2026-02-25.json. Evidence sentences are verbatim from the filing text.",
+  "triples": [
+    {
+      "subject": "nvidia",
+      "predicate": "MANUFACTURED_BY",
+      "target": "tsmc",
+      "evidence": "We utilize foundries, such as Taiwan Semiconductor Manufacturing Company Limited, or TSMC, and Samsung Electronics Co., Ltd., or Samsung, to produce our semiconductor wafers."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "MANUFACTURED_BY",
+      "target": "samsung",
+      "evidence": "We utilize foundries, such as Taiwan Semiconductor Manufacturing Company Limited, or TSMC, and Samsung Electronics Co., Ltd., or Samsung, to produce our semiconductor wafers."
+    },
+    {
+      "subject": "sk-hynix",
+      "predicate": "SUPPLIES",
+      "target": "nvidia",
+      "evidence": "We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung."
+    },
+    {
+      "subject": "micron",
+      "predicate": "SUPPLIES",
+      "target": "nvidia",
+      "evidence": "We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung."
+    },
+    {
+      "subject": "samsung",
+      "predicate": "SUPPLIES",
+      "target": "nvidia",
+      "evidence": "We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung."
+    },
+    {
+      "subject": "hon-hai",
+      "predicate": "SUPPLIES",
+      "target": "nvidia",
+      "evidence": "We engage with independent subcontractors and contract manufacturers such as Hon Hai Precision Industry Co., Ltd., Wistron Corporation, and Fabrinet to perform assembly, testing and packaging of our final products."
+    },
+    {
+      "subject": "wistron",
+      "predicate": "SUPPLIES",
+      "target": "nvidia",
+      "evidence": "We engage with independent subcontractors and contract manufacturers such as Hon Hai Precision Industry Co., Ltd., Wistron Corporation, and Fabrinet to perform assembly, testing and packaging of our final products."
+    },
+    {
+      "subject": "fabrinet",
+      "predicate": "SUPPLIES",
+      "target": "nvidia",
+      "evidence": "We engage with independent subcontractors and contract manufacturers such as Hon Hai Precision Industry Co., Ltd., Wistron Corporation, and Fabrinet to perform assembly, testing and packaging of our final products."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "amd",
+      "evidence": "suppliers and licensors of hardware and software for discrete and integrated GPUs, custom chips and other accelerated computing solutions, including solutions offered for AI, such as Advanced Micro Devices, Inc., or AMD, Huawei Technologies Co. Ltd., or Huawei, and Intel Corporation, or Intel;"
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "intel",
+      "evidence": "suppliers and licensors of hardware and software for discrete and integrated GPUs, custom chips and other accelerated computing solutions, including solutions offered for AI, such as Advanced Micro Devices, Inc., or AMD, Huawei Technologies Co. Ltd., or Huawei, and Intel Corporation, or Intel;"
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "huawei",
+      "evidence": "suppliers and licensors of hardware and software for discrete and integrated GPUs, custom chips and other accelerated computing solutions, including solutions offered for AI, such as Advanced Micro Devices, Inc., or AMD, Huawei Technologies Co. Ltd., or Huawei, and Intel Corporation, or Intel;"
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "microsoft",
+      "evidence": "large cloud services companies with internal teams designing hardware and software that incorporate accelerated or AI computing functionality as part of their internal solutions or platforms, such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc., Huawei, and Microsoft Corporation, or Microsoft;"
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "amazon",
+      "evidence": "large cloud services companies with internal teams designing hardware and software that incorporate accelerated or AI computing functionality as part of their internal solutions or platforms, such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc., Huawei, and Microsoft Corporation, or Microsoft;"
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "alphabet",
+      "evidence": "large cloud services companies with internal teams designing hardware and software that incorporate accelerated or AI computing functionality as part of their internal solutions or platforms, such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc., Huawei, and Microsoft Corporation, or Microsoft;"
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "broadcom",
+      "evidence": "networking products consisting of switches, network adapters (including DPUs), and cable solutions (including optical modules) include such as AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard Enterprise Company, Huawei, Intel, Lumentum Holdings Inc., and Marvell Technology, Inc, as well as internal teams of system vendors and large cloud services companies."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "qualcomm",
+      "evidence": "suppliers of hardware and software for SoC products that are used in servers or embedded into automobiles, autonomous machines, and gaming devices, such as Ambarella, Inc., AMD, Broadcom, Intel, Qualcomm Incorporated, Renesas Electronics Corporation, and Samsung, or companies with internal teams designing SoC products for their own products and services, such as Tesla, Inc."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "tesla",
+      "evidence": "suppliers of hardware and software for SoC products that are used in servers or embedded into automobiles, autonomous machines, and gaming devices, such as Ambarella, Inc., AMD, Broadcom, Intel, Qualcomm Incorporated, Renesas Electronics Corporation, and Samsung, or companies with internal teams designing SoC products for their own products and services, such as Tesla, Inc."
+    },
+    {
+      "subject": "mellanox",
+      "predicate": "SUBSIDIARY_OF",
+      "target": "nvidia",
+      "evidence": "Our acquisition of Mellanox in 2020 expanded our offerings to include networking, enabled our platforms to be data center scale, and led to the introduction of a new processor class – the data processing unit, or DPU."
+    },
+    {
+      "subject": "nvidia-compute-networking",
+      "predicate": "IN_SEGMENT",
+      "target": "nvidia",
+      "evidence": "Our two operating segments are \"Compute & Networking\" and \"Graphics.\" Refer to Note 16 of the Notes to the Consolidated Financial Statements in Part IV, Item 15 of this Annual Report on Form 10-K for additional information."
+    },
+    {
+      "subject": "nvidia-graphics",
+      "predicate": "IN_SEGMENT",
+      "target": "nvidia",
+      "evidence": "Our two operating segments are \"Compute & Networking\" and \"Graphics.\" Refer to Note 16 of the Notes to the Consolidated Financial Statements in Part IV, Item 15 of this Annual Report on Form 10-K for additional information."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "alibaba",
+      "evidence": "large cloud services companies with internal teams designing hardware and software that incorporate accelerated or AI computing functionality as part of their internal solutions or platforms, such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc., Huawei, and Microsoft Corporation, or Microsoft;"
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "arista",
+      "evidence": "networking products consisting of switches, network adapters (including DPUs), and cable solutions (including optical modules) include such as AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard Enterprise Company, Huawei, Intel, Lumentum Holdings Inc., and Marvell Technology, Inc, as well as internal teams of system vendors and large cloud services companies."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "cisco",
+      "evidence": "networking products consisting of switches, network adapters (including DPUs), and cable solutions (including optical modules) include such as AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard Enterprise Company, Huawei, Intel, Lumentum Holdings Inc., and Marvell Technology, Inc, as well as internal teams of system vendors and large cloud services companies."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "hpe",
+      "evidence": "networking products consisting of switches, network adapters (including DPUs), and cable solutions (including optical modules) include such as AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard Enterprise Company, Huawei, Intel, Lumentum Holdings Inc., and Marvell Technology, Inc, as well as internal teams of system vendors and large cloud services companies."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "marvell",
+      "evidence": "networking products consisting of switches, network adapters (including DPUs), and cable solutions (including optical modules) include such as AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard Enterprise Company, Huawei, Intel, Lumentum Holdings Inc., and Marvell Technology, Inc, as well as internal teams of system vendors and large cloud services companies."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "renesas",
+      "evidence": "suppliers of hardware and software for SoC products that are used in servers or embedded into automobiles, autonomous machines, and gaming devices, such as Ambarella, Inc., AMD, Broadcom, Intel, Qualcomm Incorporated, Renesas Electronics Corporation, and Samsung, or companies with internal teams designing SoC products for their own products and services, such as Tesla, Inc."
+    },
+    {
+      "subject": "nvidia",
+      "predicate": "COMPETES_WITH",
+      "target": "baidu",
+      "evidence": "large cloud services companies with internal teams designing hardware and software that incorporate accelerated or AI computing functionality as part of their internal solutions or platforms, such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc., Huawei, and Microsoft Corporation, or Microsoft;"
+    }
+  ]
+}
