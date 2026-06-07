@@ -51,3 +51,92 @@ def test_facts_replace_same_metric_period(tmp_path):
     uc.apply(tmp_path, edges=[], facts=[{**f, "value": 2}], source_meta=SRC, today="2026-06-08")
     nv = frontmatter.load(tmp_path / "entities" / "nvidia.md")
     assert len(nv["facts"]) == 1 and nv["facts"][0]["value"] == 2
+
+
+def test_confidence_raise_only(tmp_path):
+    """apply high then medium → stays high; medium then high → becomes high."""
+    e_high = {**EDGE, "confidence": "high"}
+    e_medium = {**EDGE, "confidence": "medium"}
+
+    # Apply high first, then medium → should stay high
+    uc.apply(tmp_path, edges=[e_high], facts=[], source_meta=SRC, today="2026-06-07")
+    uc.apply(tmp_path, edges=[e_medium], facts=[], source_meta={**SRC, "id": "src-2"},
+             today="2026-06-07")
+    nv = frontmatter.load(tmp_path / "entities" / "nvidia.md")
+    assert nv["relations"][0]["confidence"] == "high"
+
+    # Fresh dir: apply medium first, then high → should become high
+    tmp2 = tmp_path / "sub"
+    tmp2.mkdir()
+    uc.apply(tmp2, edges=[e_medium], facts=[], source_meta=SRC, today="2026-06-07")
+    uc.apply(tmp2, edges=[e_high], facts=[], source_meta={**SRC, "id": "src-2"},
+             today="2026-06-07")
+    nv2 = frontmatter.load(tmp2 / "entities" / "nvidia.md")
+    assert nv2["relations"][0]["confidence"] == "high"
+
+
+def test_low_page_not_published(tmp_path):
+    """Pre-create entity page with low confidence (publish: false); apply edge → publish stays False; lint passes."""
+    from scripts.lint_frontmatter import lint_dir
+    import frontmatter as fm
+
+    # Pre-create nvidia page with low confidence and publish: false
+    entities_dir = tmp_path / "entities"
+    entities_dir.mkdir(parents=True, exist_ok=True)
+    nv_post = fm.Post(f"{uc.AUTO_BEGIN}\n{uc.AUTO_END}\n")
+    nv_post.metadata = {
+        "type": "Company",
+        "id": "nvidia",
+        "label": "NVIDIA",
+        "aliases": ["NVIDIA"],
+        "confidence": "low",
+        "publish": False,
+        "last_updated": "2026-06-07",
+        "sources": [],
+        "relations": [],
+    }
+    (entities_dir / "nvidia.md").write_text(fm.dumps(nv_post) + "\n")
+
+    # Apply an edge that touches nvidia
+    uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-07")
+
+    nv = fm.load(tmp_path / "entities" / "nvidia.md")
+    assert nv["publish"] is False
+    assert lint_dir(tmp_path) == []
+
+
+def test_byte_idempotent(tmp_path):
+    """apply twice with identical inputs → file bytes identical between run 1 and run 2."""
+    uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-07")
+    bytes_after_first = (tmp_path / "entities" / "nvidia.md").read_bytes()
+
+    uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-07")
+    bytes_after_second = (tmp_path / "entities" / "nvidia.md").read_bytes()
+
+    assert bytes_after_first == bytes_after_second
+
+
+def test_malformed_auto_block_raises(tmp_path):
+    """Page body with END before BEGIN → ValueError raised."""
+    import pytest
+    import frontmatter as fm
+
+    # Create a page where AUTO_END comes before AUTO_BEGIN
+    entities_dir = tmp_path / "entities"
+    entities_dir.mkdir(parents=True, exist_ok=True)
+    bad_post = fm.Post(f"{uc.AUTO_END}\nsome text\n{uc.AUTO_BEGIN}\n")
+    bad_post.metadata = {
+        "type": "Company",
+        "id": "nvidia",
+        "label": "NVIDIA",
+        "aliases": ["NVIDIA"],
+        "confidence": "medium",
+        "publish": True,
+        "last_updated": "2026-06-07",
+        "sources": [],
+        "relations": [],
+    }
+    (entities_dir / "nvidia.md").write_text(fm.dumps(bad_post) + "\n")
+
+    with pytest.raises(ValueError, match="nvidia"):
+        uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-07")

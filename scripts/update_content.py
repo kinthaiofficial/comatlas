@@ -22,7 +22,7 @@ def _stub(content: Path, eid: str, etype: str, label: str, today: str) -> frontm
     p = content / "entities" / f"{eid}.md"
     if p.exists():
         return frontmatter.load(str(p))
-    post = frontmatter.Post(f"\n{AUTO_BEGIN}\n{AUTO_END}\n")
+    post = frontmatter.Post(f"{AUTO_BEGIN}\n{AUTO_END}\n")
     post.metadata = {
         "type": etype,
         "id": eid,
@@ -104,11 +104,19 @@ def _render_auto_block(meta: dict) -> str:
     return "\n".join(rows)
 
 
-def _rewrite_body(post: frontmatter.Post) -> str:
+def _rewrite_body(post: frontmatter.Post, page_id: str = "") -> str:
     """Replace the AUTO block in the body while preserving hand-written prose."""
     body = post.content
     if AUTO_BEGIN not in body:
         body += f"\n{AUTO_BEGIN}\n{AUTO_END}\n"
+    # Guard: END must not appear before BEGIN, and END must exist after BEGIN
+    begin_idx = body.index(AUTO_BEGIN)
+    end_idx = body.find(AUTO_END)
+    if end_idx == -1 or end_idx < begin_idx:
+        raise ValueError(
+            f"Malformed AUTO block in page '{page_id}': "
+            f"{AUTO_END} must appear after {AUTO_BEGIN}"
+        )
     head, rest = body.split(AUTO_BEGIN, 1)
     _, tail = rest.split(AUTO_END, 1)
     return f"{head}{AUTO_BEGIN}\n{_render_auto_block(post.metadata)}\n{AUTO_END}{tail}"
@@ -141,7 +149,7 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
 
     for fact in facts:
         fact = dict(fact)
-        eid = fact.pop("entity")
+        eid = fact.pop("entity", "nvidia")
         if eid not in touched:
             touched[eid] = _stub(content, eid, "Company", eid, today)
         flist = touched[eid].metadata.setdefault("facts", [])
@@ -150,8 +158,10 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
             x for x in flist
             if not (x["metric"] == fact["metric"] and x["period"] == fact["period"])
         ]
-        flist.append({k: fact[k] for k in
-                      ("metric", "value", "unit", "period", "source", "confidence", "extractors")})
+        flist.append({
+            **{k: fact[k] for k in ("metric", "value", "period", "source", "confidence", "extractors")},
+            "unit": fact.get("unit", ""),
+        })
 
     for eid, post in touched.items():
         m = post.metadata
@@ -160,5 +170,5 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
             m["sources"].append(source_meta["id"])
         # Publish gate: low-confidence pages must not be published (red line #3)
         m["publish"] = m.get("confidence") != "low"
-        post.content = _rewrite_body(post)
+        post.content = _rewrite_body(post, page_id=eid)
         _dump(post, content / "entities" / f"{eid}.md")
