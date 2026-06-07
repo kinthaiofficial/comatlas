@@ -2,3 +2,4 @@
 pythonpath = ["."]
 markers = ["live: needs real API keys", "heavy: needs large model downloads"]
 testpaths = ["tests"]
+addopts = "-m 'not live and not heavy'"

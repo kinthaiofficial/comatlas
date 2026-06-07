@@ -55,7 +55,7 @@ def ingest_filings(filings) -> list[str]:
             continue
         items = SECTIONS.get(f.form, [])
         obj = f.obj() if items else None
-        sections = ({i: (obj[i] or "") for i in items} if items
+        sections = ({i: (obj.get(i, "") or "") for i in items} if items
                     else {"body": f.text()[:50_000]})
         rec = {
             "source_id": sid,
@@ -138,9 +138,7 @@ class _EdgarFilingAdapter:
                 else:
                     result[key] = ""
             return result
-        else:
-            # 8-K and others: no structured items
-            return {}
+        # forms outside SECTIONS never call obj()
 
     def text(self):
         try:
