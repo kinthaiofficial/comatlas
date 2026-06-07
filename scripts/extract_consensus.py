@@ -41,7 +41,7 @@ def process_source(raw: dict, today: str) -> None:
     if raw["form"] in ("10-K", "10-Q"):
         try:
             f, e = leg_xbrl.extract(raw)
-            facts += [{"entity": "nvidia", **x} for x in f]
+            facts += [{**x, "entity": "nvidia"} for x in f]
             edges += [normalize_xbrl_edge(x) for x in e]
         except ValueError as exc:
             print(f"[extract_consensus] XBRL leg skipped for {raw['source_id']}: {exc}",
@@ -57,17 +57,29 @@ def process_source(raw: dict, today: str) -> None:
 
 
 def run(today: str | None = None) -> list[str]:
+    """Process every unprocessed raw source and return list of successfully processed source ids.
+
+    Each source is handled in isolation: a failure (missing file or extraction error) prints
+    a SKIP message to stderr and leaves that source's processed flag as False, so the next
+    run will retry it.  Successful sources are marked processed=True and the state file is
+    persisted immediately after each one, so progress is never lost if a later source crashes.
+    """
     today = today or datetime.date.today().isoformat()
-    state = json.loads((RAW / "_state.json").read_text())
+    state_path = RAW / "_state.json"
+    state = json.loads(state_path.read_text())
     done = []
     for sid, st in sorted(state.items()):
         if st.get("processed"):
             continue
-        raw = json.loads((RAW / "sec" / f"{sid}.json").read_text())
-        process_source(raw, today)
+        try:
+            raw = json.loads((RAW / "sec" / f"{sid}.json").read_text())
+            process_source(raw, today)
+        except Exception as exc:
+            print(f"SKIP {sid}: {exc}", file=sys.stderr)
+            continue
         st["processed"] = True
+        state_path.write_text(json.dumps(state, indent=2, sort_keys=True))
         done.append(sid)
-    (RAW / "_state.json").write_text(json.dumps(state, indent=2, sort_keys=True))
     return done
 
 

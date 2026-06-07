@@ -88,3 +88,60 @@ def test_xbrl_value_error_does_not_kill_pipeline(tmp_path, monkeypatch):
     assert done == ["nvda-10k-2026-02-26"]
     state = json.loads((tmp_path / "raw" / "_state.json").read_text())
     assert state["nvda-10k-2026-02-26"]["processed"] is True
+
+
+def test_missing_raw_file_skipped(tmp_path, monkeypatch):
+    """A source whose raw JSON file is absent is skipped; the other source succeeds."""
+    raw_dir = tmp_path / "raw" / "sec"
+    raw_dir.mkdir(parents=True)
+    # Only write the second source's file; first is intentionally absent.
+    sid_missing = "nvda-10k-2025-01-01"
+    sid_good = "nvda-10k-2026-02-26"
+    raw_dir.joinpath(f"{sid_good}.json").write_text(json.dumps(RAW))
+    (tmp_path / "raw" / "_state.json").write_text(json.dumps({
+        sid_missing: {"accession": "0000-00-0", "processed": False},
+        sid_good: {"accession": "0001-26-1", "processed": False},
+    }))
+    monkeypatch.setattr(pipe, "RAW", tmp_path / "raw")
+    monkeypatch.setattr(pipe, "CONTENT", tmp_path / "content")
+    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None: TRIPLES)
+    monkeypatch.setattr(pipe.leg_xbrl, "extract", lambda raw: ([], []))
+
+    done = pipe.run(today="2026-06-07")
+    assert done == [sid_good]
+
+    state = json.loads((tmp_path / "raw" / "_state.json").read_text())
+    assert state[sid_good]["processed"] is True
+    assert state[sid_missing]["processed"] is False
+
+
+def test_crashing_source_isolated(tmp_path, monkeypatch):
+    """If anchor_claude.extract_source raises for one source, only that source is skipped."""
+    raw_dir = tmp_path / "raw" / "sec"
+    raw_dir.mkdir(parents=True)
+    sid_bad = "nvda-10k-2025-01-01"
+    sid_good = "nvda-10k-2026-02-26"
+    raw_bad = {**RAW, "source_id": sid_bad, "filing_date": "2025-01-01"}
+    raw_dir.joinpath(f"{sid_bad}.json").write_text(json.dumps(raw_bad))
+    raw_dir.joinpath(f"{sid_good}.json").write_text(json.dumps(RAW))
+    (tmp_path / "raw" / "_state.json").write_text(json.dumps({
+        sid_bad: {"accession": "0000-00-0", "processed": False},
+        sid_good: {"accession": "0001-26-1", "processed": False},
+    }))
+    monkeypatch.setattr(pipe, "RAW", tmp_path / "raw")
+    monkeypatch.setattr(pipe, "CONTENT", tmp_path / "content")
+    monkeypatch.setattr(pipe.leg_xbrl, "extract", lambda raw: ([], []))
+
+    def _extract_source_side_effect(raw, runner=None):
+        if raw["source_id"] == sid_bad:
+            raise RuntimeError("simulated anchor crash")
+        return TRIPLES
+
+    monkeypatch.setattr(pipe.anchor_claude, "extract_source", _extract_source_side_effect)
+
+    done = pipe.run(today="2026-06-07")
+    assert done == [sid_good]
+
+    state = json.loads((tmp_path / "raw" / "_state.json").read_text())
+    assert state[sid_good]["processed"] is True
+    assert state[sid_bad]["processed"] is False
