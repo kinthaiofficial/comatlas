@@ -1,5 +1,4 @@
 // Auto-generated plugin index — no external plugins installed
-import { componentRegistry } from "../../quartz/components/registry"
 
 export type ContentDetails = {
   slug: string
