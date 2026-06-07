@@ -5,6 +5,11 @@ import json
 import sys
 from pathlib import Path
 
+# Ensure repo root is on sys.path when invoked directly (e.g. python scripts/extract_consensus.py)
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
 from scripts.extract import anchor_claude, leg_xbrl
 from scripts.normalize import normalize_surface
 from scripts.consensus import score_m1
