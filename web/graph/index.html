@@ -1,0 +1,21 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ComAtlas — NVIDIA Supply-Chain Graph</title>
+<style>
+  body{margin:0;font:14px system-ui}
+  #panel{position:fixed;top:12px;left:12px;background:#fffc;padding:10px 14px;border-radius:8px;
+         box-shadow:0 1px 6px #0002;z-index:2;max-height:80vh;overflow:auto}
+  #foot{position:fixed;bottom:8px;left:12px;font-size:12px;color:#666;z-index:2}
+</style></head><body>
+<div id="panel">
+  <strong>ComAtlas graph</strong><br>
+  <label>min confidence
+    <select id="conf"><option value="medium" selected>medium</option><option value="high">high</option></select>
+  </label>
+  <div id="preds"></div>
+</div>
+<div id="graph"></div>
+<div id="foot">Dashed = unverified (medium). Not investment advice. <a href="/">wiki</a></div>
+<script src="./vendor/force-graph.min.js"></script>
+<script type="module" src="./app.js"></script>
+</body></html>
