@@ -111,12 +111,12 @@ def test_extract_live_nvda():
 
     rev_facts = [f for f in facts if f["metric"] == "revenue"]
     assert len(rev_facts) == 1, f"Expected 1 revenue fact, got {len(rev_facts)}"
-    assert rev_facts[0]["value"] > 100_000_000_000, (
+    assert rev_facts[0]["value"] > 200_000_000_000, (
         f"Revenue {rev_facts[0]['value']} unexpectedly low"
     )
 
     seg_edges = [e for e in edges if e["predicate"] == "IN_SEGMENT"]
-    assert len(seg_edges) >= 1, "Expected at least 1 IN_SEGMENT edge"
+    assert len(seg_edges) == 2, f"Expected exactly 2 IN_SEGMENT edges, got {len(seg_edges)}"
 
     # Verify edge shape
     for e in seg_edges:

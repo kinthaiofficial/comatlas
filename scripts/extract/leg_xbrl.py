@@ -161,6 +161,8 @@ def extract(raw: dict) -> tuple[list, list]:
 
     # --- Total revenue ---
     rev_df = xbrl.facts.get_facts_by_concept("us-gaap:Revenues")
+    if rev_df.empty or "is_dimensioned" not in rev_df.columns:
+        raise ValueError(f"no XBRL revenue facts in {raw['source_id']}")
     non_dim = rev_df[rev_df["is_dimensioned"] == False]
     primary_rev = non_dim[non_dim["period_end"].astype(str) == period_str]
     if primary_rev.empty:
