@@ -22,6 +22,14 @@ test("asOf slices by validity window", () => {
   assert.equal(g.edges.length, 1);    // a-c expired 2024-Q4; a-b valid since 2020-Q1
   assert.equal(g.edges[0].predicate, "MANUFACTURED_BY");
 });
+test("edge with null valid_from and null as_of is kept when asOf active", () => {
+  const g2 = {
+    nodes: [{ id: "x", type: "Company", label: "X" }, { id: "y", type: "Company", label: "Y" }],
+    edges: [{ source: "x", target: "y", predicate: "OWNS", valid_from: null, as_of: null, valid_to: null, confidence: "high" }]
+  };
+  const out = filterGraph(g2, { asOf: "2025-Q2" });
+  assert.equal(out.edges.length, 1, "edge without time info must survive asOf filter");
+});
 test("adapter shape", () => {
   const fg = toForceGraph(G);
   assert.deepEqual(Object.keys(fg), ["nodes", "links"]);

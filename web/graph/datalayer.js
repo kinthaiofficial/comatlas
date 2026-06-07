@@ -8,6 +8,7 @@ export function cmpQuarter(a, b) {
 
 function inWindow(e, asOf) {
   const from = e.valid_from ?? e.as_of;
+  if (from == null) return true;
   if (cmpQuarter(asOf, from) < 0) return false;
   return e.valid_to == null || cmpQuarter(asOf, e.valid_to) <= 0;
 }
