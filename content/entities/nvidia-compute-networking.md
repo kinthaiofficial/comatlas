@@ -12,7 +12,6 @@ relations:
   corroborates:
   - nvda-10q-2026-05-20
   extractors:
-  - claude
   - xbrl
   predicate: IN_SEGMENT
   source: nvda-10k-2026-02-25

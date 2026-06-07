@@ -5,6 +5,8 @@ This script is used when the claude -p anchor leg is too slow (rate-limited
 by concurrent sessions). It builds a representative KG from the human-verified
 gold triples plus structured XBRL data extracted from the 10-K and 10-Q filings.
 
+Gold-seeded edges are HUMAN-verified curation, never attributed to an LLM extractor (honesty red line).
+
 Usage:
     PYTHONPATH=/root/comatlas/code/comatlas python scripts/seed_from_gold.py
 """
@@ -63,7 +65,7 @@ def gold_edges(source_id: str, as_of: str) -> list[dict]:
             "as_of": as_of,
             "source": source_id,
             "evidence": t["evidence"],
-            "extractors": ["claude"],
+            "extractors": ["human"],
             "from_structured": False,
         }
         edge["confidence"] = score_m1(edge)

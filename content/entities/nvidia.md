@@ -60,7 +60,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: MANUFACTURED_BY
   source: nvda-10k-2026-02-25
   target: tsmc
@@ -68,7 +68,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: MANUFACTURED_BY
   source: nvda-10k-2026-02-25
   target: samsung
@@ -76,7 +76,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: amd
@@ -84,7 +84,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: intel
@@ -92,7 +92,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: huawei
@@ -100,7 +100,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: microsoft
@@ -108,7 +108,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: amazon
@@ -116,7 +116,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: alphabet
@@ -124,7 +124,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: broadcom
@@ -132,7 +132,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: qualcomm
@@ -140,7 +140,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: tesla
@@ -148,7 +148,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: alibaba
@@ -156,7 +156,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: arista
@@ -164,7 +164,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: cisco
@@ -172,7 +172,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: hpe
@@ -180,7 +180,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: marvell
@@ -188,7 +188,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: renesas
@@ -196,7 +196,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: COMPETES_WITH
   source: nvda-10k-2026-02-25
   target: baidu

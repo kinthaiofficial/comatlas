@@ -11,7 +11,7 @@ relations:
   confidence: medium
   corroborates: []
   extractors:
-  - claude
+  - human
   predicate: SUBSIDIARY_OF
   source: nvda-10k-2026-02-25
   target: nvidia
