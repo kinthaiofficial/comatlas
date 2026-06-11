@@ -11,22 +11,21 @@ mellanox: [Mellanox, Mellanox Technologies]
 cuda: [CUDA]
 nvidia-compute-networking: ["Compute & Networking", "Compute and Networking"]
 nvidia-graphics: [Graphics]
-# pending human review
 huawei: [Huawei, "Huawei Technologies", "Huawei Technologies Co. Ltd.", "Huawei Technologies Co., Ltd.", 华为]
 amazon: [Amazon, "Amazon.com", "Amazon Web Services", AWS]
-hon-hai: ["Hon Hai", "Hon Hai Precision Industry", "Foxconn", "Hon Hai Precision Industry Co., Ltd.", "Foxconn Technology Group"]  # pending human review
-wistron: [Wistron, "Wistron Corporation"]  # pending human review
-fabrinet: [Fabrinet]  # pending human review
-broadcom: [Broadcom, "Broadcom Inc.", "Broadcom Corporation"]  # pending human review
-qualcomm: [Qualcomm, "Qualcomm Incorporated", "Qualcomm Technologies"]  # pending human review
-tesla: [Tesla, "Tesla, Inc.", "Tesla Motors"]  # pending human review
-alibaba: ["Alibaba", "Alibaba Group", "Alibaba Group Holding", 阿里巴巴]  # pending human review
-arista: ["Arista Networks", "Arista Networks, Inc."]  # pending human review
-cisco: [Cisco, "Cisco Systems", "Cisco Systems, Inc."]  # pending human review
-hpe: ["Hewlett Packard Enterprise", "Hewlett Packard Enterprise Company", HPE]  # pending human review
-marvell: ["Marvell Technology", "Marvell Technology, Inc", "Marvell Technology Group"]  # pending human review
-ambarella: [Ambarella, "Ambarella, Inc."]  # pending human review
-renesas: ["Renesas", "Renesas Electronics", "Renesas Electronics Corporation"]  # pending human review
-lumentum: [Lumentum, "Lumentum Holdings", "Lumentum Holdings Inc."]  # pending human review
-baidu: [Baidu, "Baidu, Inc.", 百度]  # pending human review
-alphabet: [Alphabet, "Alphabet Inc.", Google]  # pending human review
+hon-hai: ["Hon Hai", "Hon Hai Precision Industry", "Foxconn", "Hon Hai Precision Industry Co., Ltd.", "Foxconn Technology Group"]
+wistron: [Wistron, "Wistron Corporation"]
+fabrinet: [Fabrinet]
+broadcom: [Broadcom, "Broadcom Inc.", "Broadcom Corporation"]
+qualcomm: [Qualcomm, "Qualcomm Incorporated", "Qualcomm Technologies"]
+tesla: [Tesla, "Tesla, Inc.", "Tesla Motors"]
+alibaba: ["Alibaba", "Alibaba Group", "Alibaba Group Holding", 阿里巴巴]
+arista: ["Arista Networks", "Arista Networks, Inc."]
+cisco: [Cisco, "Cisco Systems", "Cisco Systems, Inc."]
+hpe: ["Hewlett Packard Enterprise", "Hewlett Packard Enterprise Company", HPE]
+marvell: ["Marvell Technology", "Marvell Technology, Inc", "Marvell Technology Group"]
+ambarella: [Ambarella, "Ambarella, Inc."]
+renesas: ["Renesas", "Renesas Electronics", "Renesas Electronics Corporation"]
+lumentum: [Lumentum, "Lumentum Holdings", "Lumentum Holdings Inc."]
+baidu: [Baidu, "Baidu, Inc.", 百度]
+alphabet: [Alphabet, "Alphabet Inc.", Google]
