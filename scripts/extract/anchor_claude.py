@@ -2,6 +2,7 @@
 G13: runs on the Claude Code SUBSCRIPTION via headless `claude -p` (no API key).
 The anchor DEFINES the canonical form; output triples carry verbatim evidence for grounding."""
 import json, os, subprocess
+from pathlib import Path
 from scripts.ontology import load_entity_types, load_predicates
 
 MODEL = os.environ.get("COMATLAS_ANCHOR_MODEL", "sonnet")
@@ -84,15 +85,49 @@ def extract_chunk(runner, chunk: str, as_of_hint: str, filer: str = "") -> list[
         except Exception as e2:
             raise ExtractionError(f"anchor output invalid after retry: {e2}")
 
-def extract_source(raw: dict, runner=None) -> list[dict]:
+def _load_partial(path: Path) -> dict:
+    """Read a checkpoint file into {(section, chunk_index): triples}."""
+    done = {}
+    if path.exists():
+        for line in path.read_text().splitlines():
+            if line.strip():
+                rec = json.loads(line)
+                done[(rec["section"], rec["chunk_index"])] = rec["triples"]
+    return done
+
+def extract_source(raw: dict, runner=None, checkpoint_dir=None) -> list[dict]:
+    """Extract every chunk of every section.
+
+    When `checkpoint_dir` is given, each chunk's result is appended to
+    `<checkpoint_dir>/<source_id>.jsonl` immediately after extraction, so a mid-run
+    failure loses no completed work: a re-run skips chunks already in the file and
+    only re-processes the rest.  The checkpoint file is deleted once the whole source
+    completes successfully.
+    """
     runner = runner or claude_runner
     filer = raw.get("filer", "NVIDIA")
+    sid = raw["source_id"]
+    ppath = None
+    done = {}
+    if checkpoint_dir is not None:
+        ppath = Path(checkpoint_dir) / f"{sid}.jsonl"
+        ppath.parent.mkdir(parents=True, exist_ok=True)
+        done = _load_partial(ppath)
     out = []
     for section, text in raw["sections"].items():
-        for chunk in _chunks(text or ""):
+        for idx, chunk in enumerate(_chunks(text or "")):
             if not chunk.strip():
                 continue
-            for t in extract_chunk(runner, chunk, raw["as_of"], filer):
-                out.append({**t, "source": raw["source_id"], "extractor": "claude",
-                            "section": section})
+            if (section, idx) in done:
+                out.extend(done[(section, idx)])
+                continue
+            triples = [{**t, "source": sid, "extractor": "claude", "section": section}
+                       for t in extract_chunk(runner, chunk, raw["as_of"], filer)]
+            if ppath is not None:
+                with ppath.open("a") as f:
+                    f.write(json.dumps({"section": section, "chunk_index": idx,
+                                        "triples": triples}) + "\n")
+            out.extend(triples)
+    if ppath is not None and ppath.exists():
+        ppath.unlink()
     return out

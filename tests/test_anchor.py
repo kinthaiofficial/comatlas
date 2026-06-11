@@ -59,6 +59,42 @@ def test_schema_violation_rejected():
             runner=lambda p, model="sonnet": rogue)
 
 
+# ── checkpoint / resume ──────────────────────────────────────────────────────
+def test_checkpoint_resumes_after_chunk_failure(tmp_path):
+    """A chunk failure mid-run must not lose already-extracted chunks: the re-run
+    skips completed chunks (no runner call) and only re-processes the failed one."""
+    raw = {"source_id": "s1", "as_of": "2026-Q1", "filer": "NVIDIA",
+           "sections": {"A": "marker_AAA", "B": "marker_BBB", "C": "marker_CCC"}}
+    seen, failed_once = [], set()
+
+    def runner(prompt, model="sonnet"):
+        tag = next(m for m in ("AAA", "BBB", "CCC") if m in prompt)
+        seen.append(tag)
+        if tag == "CCC" and "CCC" not in failed_once:
+            failed_once.add("CCC")
+            raise anchor_claude.ExtractionError("simulated chunk failure")
+        return FIX
+
+    import pytest
+    cp = tmp_path / "partial"
+    with pytest.raises(anchor_claude.ExtractionError):           # A,B saved; C fails
+        anchor_claude.extract_source(raw, runner=runner, checkpoint_dir=cp)
+    assert seen == ["AAA", "BBB", "CCC"]
+
+    seen.clear()
+    triples = anchor_claude.extract_source(raw, runner=runner, checkpoint_dir=cp)
+    assert seen == ["CCC"], f"only the failed chunk should re-run, got {seen}"
+    assert len(triples) == 3, "result must contain all three chunks' triples"
+    assert all(t["source"] == "s1" and t["extractor"] == "claude" for t in triples)
+
+def test_checkpoint_cleaned_up_on_success(tmp_path):
+    """A fully-successful run leaves no partial file behind."""
+    raw = {"source_id": "s2", "as_of": "2026-Q1", "sections": {"A": "marker_AAA"}}
+    cp = tmp_path / "partial"
+    anchor_claude.extract_source(raw, runner=lambda p, model="sonnet": FIX, checkpoint_dir=cp)
+    assert not (cp / "s2.jsonl").exists()
+
+
 # ── live smoke ──────────────────────────────────────────────────────────────
 import pytest
 

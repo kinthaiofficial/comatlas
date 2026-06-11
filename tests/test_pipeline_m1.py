@@ -26,7 +26,7 @@ def _setup(tmp_path, monkeypatch):
         {"nvda-10k-2026-02-26": {"accession": "0001-26-1", "processed": False}}))
     monkeypatch.setattr(pipe, "RAW", tmp_path / "raw")
     monkeypatch.setattr(pipe, "CONTENT", tmp_path / "content")
-    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None: TRIPLES)
+    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None, checkpoint_dir=None: TRIPLES)
     monkeypatch.setattr(pipe.leg_xbrl, "extract", lambda raw: ([], []))
 
 
@@ -66,7 +66,7 @@ def test_xbrl_skipped_for_8k(tmp_path, monkeypatch):
         {"nvda-8k-2026-03-01": {"accession": "0001-26-2", "processed": False}}))
     monkeypatch.setattr(pipe, "RAW", tmp_path / "raw")
     monkeypatch.setattr(pipe, "CONTENT", tmp_path / "content")
-    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None: [])
+    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None, checkpoint_dir=None: [])
 
     def _must_not_be_called(raw):
         raise AssertionError("leg_xbrl.extract must not be called for 8-K")
@@ -105,7 +105,7 @@ def test_missing_raw_file_skipped(tmp_path, monkeypatch):
     }))
     monkeypatch.setattr(pipe, "RAW", tmp_path / "raw")
     monkeypatch.setattr(pipe, "CONTENT", tmp_path / "content")
-    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None: TRIPLES)
+    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None, checkpoint_dir=None: TRIPLES)
     monkeypatch.setattr(pipe.leg_xbrl, "extract", lambda raw: ([], []))
 
     done = pipe.run(today="2026-06-07")
@@ -133,7 +133,7 @@ def test_crashing_source_isolated(tmp_path, monkeypatch):
     monkeypatch.setattr(pipe, "CONTENT", tmp_path / "content")
     monkeypatch.setattr(pipe.leg_xbrl, "extract", lambda raw: ([], []))
 
-    def _extract_source_side_effect(raw, runner=None):
+    def _extract_source_side_effect(raw, runner=None, checkpoint_dir=None):
         if raw["source_id"] == sid_bad:
             raise RuntimeError("simulated anchor crash")
         return TRIPLES
@@ -173,7 +173,7 @@ def test_domain_violating_edge_dropped(tmp_path, monkeypatch):
          "evidence": "NVLink belongs to the Data Center segment.",
          "as_of": "2026-Q1", "source": "nvda-10k-2026-02-26", "extractor": "claude"},
     ]
-    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None: mixed_triples)
+    monkeypatch.setattr(pipe.anchor_claude, "extract_source", lambda raw, runner=None, checkpoint_dir=None: mixed_triples)
 
     done = pipe.run(today="2026-06-07")
     assert done == ["nvda-10k-2026-02-26"]

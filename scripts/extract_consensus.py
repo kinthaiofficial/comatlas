@@ -52,7 +52,8 @@ def process_source(raw: dict, today: str) -> None:
         except ValueError as exc:
             print(f"[extract_consensus] XBRL leg skipped for {raw['source_id']}: {exc}",
                   file=sys.stderr)
-    edges += [normalize_triple(t) for t in anchor_claude.extract_source(raw)]
+    edges += [normalize_triple(t)
+              for t in anchor_claude.extract_source(raw, checkpoint_dir=RAW / "_partial")]
     for e in edges:
         e["confidence"] = score_m1(e)
     predicates = load_predicates()
