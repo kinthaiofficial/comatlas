@@ -2,8 +2,10 @@
 
 Same closed-set schema as the anchor (FR-5). Votes only — never defines the canonical form.
 M3 is a reasoning model; we force a `record_triples` tool call and parse tool_calls only.
-Out-of-set / malformed triples are DROPPED (a vote may be noisy; that is not fatal)."""
-import json, os
+Out-of-set / malformed triples are DROPPED (a vote may be noisy; that is not fatal).
+Per-chunk failures (rate-limit, or M3's 422 content-moderation on sensitive geopolitics) are
+TOLERATED — that chunk simply casts no votes; the anchor still covers it."""
+import json, os, sys
 from scripts.extract.anchor_claude import triples_schema, RULES, _chunks
 from scripts.ontology import load_entity_types, load_predicates
 
@@ -34,11 +36,15 @@ def extract_source(raw: dict, client=None) -> list[dict]:
         for chunk in _chunks(text or ""):
             if not chunk.strip():
                 continue
-            resp = client.chat.completions.create(
-                model=MODEL, tools=[openai_tool()],
-                tool_choice={"type": "function", "function": {"name": "record_triples"}},
-                messages=[{"role": "system", "content": RULES},
-                          {"role": "user", "content": f"as_of hint: {raw['as_of']}\n<text>\n{chunk}\n</text>"}])
+            try:
+                resp = client.chat.completions.create(
+                    model=MODEL, tools=[openai_tool()],
+                    tool_choice={"type": "function", "function": {"name": "record_triples"}},
+                    messages=[{"role": "system", "content": RULES},
+                              {"role": "user", "content": f"as_of hint: {raw['as_of']}\n<text>\n{chunk}\n</text>"}])
+            except Exception as exc:                          # rate-limit, 422 content-moderation, etc.
+                print(f"[second_minimax] chunk skipped ({section}): {str(exc)[:120]}", file=sys.stderr)
+                continue
             for call in (resp.choices[0].message.tool_calls or []):
                 for t in json.loads(call.function.arguments).get("triples", []):
                     if _valid(t, types, preds):

@@ -45,6 +45,24 @@ def test_invalid_vote_triple_dropped_not_raised():
     assert len(triples) == 1 and triples[0]["predicate"] == "MANUFACTURED_BY"   # invalid dropped, valid kept
 
 
+def test_per_chunk_failure_is_tolerated():
+    """A 422/rate-limit on one chunk must not abort the whole second vote (real-run lesson:
+    MiniMax content-moderation 422s on sensitive geopolitics text)."""
+    big = "NVIDIA relies on TSMC. " * 700                    # > 12000 chars -> 2 chunks
+    raw = {"source_id": "s1", "as_of": "2026-Q1", "sections": {"x": big}}
+
+    class Flaky:
+        def __init__(self): self.chat = self; self.completions = self; self.n = 0
+        def create(self, **kw):
+            self.n += 1
+            if self.n == 1:
+                raise RuntimeError("Error code: 422 - input new_sensitive")
+            return FakeOpenAI().create(**kw)
+
+    triples = mm.extract_source(raw, client=Flaky())
+    assert len(triples) >= 1                                  # chunk-2 votes survive the chunk-1 failure
+
+
 # ── live smoke (real MiniMax key; excluded by default via -m 'not live') ──────
 import pytest
 
