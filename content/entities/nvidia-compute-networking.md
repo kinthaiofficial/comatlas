@@ -15,6 +15,7 @@ relations:
   - claude
   - xbrl
   predicate: IN_SEGMENT
+  quote: 'XBRL reportable segment: Compute & Networking'
   source: nvda-10k-2026-02-25
   target: nvidia
 sources:
@@ -31,5 +32,5 @@ Compute & Networking is one of NVIDIA's two reported operating segments, coverin
 <!-- AUTO-RELATIONS:BEGIN -->
 | relation | target | as of | confidence | basis | source |
 |---|---|---|---|---|---|
-| IN_SEGMENT | [[nvidia]] | 2026-Q2 | high |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| IN_SEGMENT | [[nvidia]] | 2026-Q2 | high | XBRL reportable segment: Compute & Networking | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
 <!-- AUTO-RELATIONS:END -->

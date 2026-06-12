@@ -14,6 +14,8 @@ relations:
   - claude
   - human
   predicate: SUPPLIES
+  quote: We engage with independent subcontractors and contract manufacturers such
+    as Hon Hai Precision Industry Co., …
   source: nvda-10k-2026-02-25
   target: nvidia
 sources:
@@ -29,5 +31,5 @@ Fabrinet is a contract manufacturer of advanced products. NVIDIA's FY2026 10-K l
 <!-- AUTO-RELATIONS:BEGIN -->
 | relation | target | as of | confidence | basis | source |
 |---|---|---|---|---|---|
-| SUPPLIES | [[nvidia]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| SUPPLIES | [[nvidia]] | 2026-Q1 | medium | We engage with independent subcontractors and contract manufacturers such as Hon Hai Precision Industry Co., … | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
 <!-- AUTO-RELATIONS:END -->

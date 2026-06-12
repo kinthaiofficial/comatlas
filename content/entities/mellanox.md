@@ -14,6 +14,8 @@ relations:
   - claude
   - human
   predicate: SUBSIDIARY_OF
+  quote: Our acquisition of Mellanox in 2020 expanded our offerings to include networking,
+    enabled our platforms …
   source: nvda-10k-2026-02-25
   target: nvidia
 sources:
@@ -29,5 +31,5 @@ Mellanox Technologies is a networking company NVIDIA acquired in 2020; per the F
 <!-- AUTO-RELATIONS:BEGIN -->
 | relation | target | as of | confidence | basis | source |
 |---|---|---|---|---|---|
-| SUBSIDIARY_OF | [[nvidia]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| SUBSIDIARY_OF | [[nvidia]] | 2026-Q1 | medium | Our acquisition of Mellanox in 2020 expanded our offerings to include networking, enabled our platforms … | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
 <!-- AUTO-RELATIONS:END -->

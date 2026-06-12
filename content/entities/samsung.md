@@ -14,6 +14,7 @@ relations:
   - claude
   - human
   predicate: SUPPLIES
+  quote: We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung.
   source: nvda-10k-2026-02-25
   target: nvidia
 sources:
@@ -29,5 +30,5 @@ Samsung Electronics appears in NVIDIA's FY2026 10-K in several roles: as a found
 <!-- AUTO-RELATIONS:BEGIN -->
 | relation | target | as of | confidence | basis | source |
 |---|---|---|---|---|---|
-| SUPPLIES | [[nvidia]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| SUPPLIES | [[nvidia]] | 2026-Q1 | medium | We purchase memory from SK Hynix Inc., Micron Technology, Inc., and Samsung. | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
 <!-- AUTO-RELATIONS:END -->
