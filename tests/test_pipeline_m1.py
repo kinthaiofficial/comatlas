@@ -1,8 +1,17 @@
-"""Tests for M1 pipeline entry: extract_consensus.py + consensus.py."""
+"""Tests for the pipeline's M1-era invariants (per-source isolation, ontology guard, incremental
+state), still valid under M2a. The M2-specific scoring/voting/grounding lives in test_pipeline_m2."""
 import json
 import pytest
 from scripts import extract_consensus as pipe
 from scripts.lint_frontmatter import lint_dir
+
+
+@pytest.fixture(autouse=True)
+def _stub_m2_legs(monkeypatch):
+    """Default M2 legs to a no-op second vote + passing grounding, so these single-anchor tests
+    behave like M1 (one claude vote, grounded → medium). Individual tests may override."""
+    monkeypatch.setattr(pipe.second_minimax, "extract_source", lambda raw: [])
+    monkeypatch.setattr(pipe.grounding, "grounding_ok", lambda *a, **k: True)
 
 RAW = {"source_id": "nvda-10k-2026-02-26", "form": "10-K", "url": "https://x",
        "accession": "0001-26-1", "filing_date": "2026-02-26", "as_of": "2026-Q1",

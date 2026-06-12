@@ -2,6 +2,7 @@
 """Pipeline entry: process every unprocessed raw source -> normalized scored edges -> content/."""
 import datetime
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -10,11 +11,10 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from scripts.extract import anchor_claude, leg_xbrl
+from scripts.extract import anchor_claude, leg_xbrl, second_minimax
 from scripts.normalize import normalize_surface
-from scripts.consensus import score_m1
 from scripts.ontology import load_predicates, edge_satisfies_ontology
-from scripts import update_content
+from scripts import update_content, consensus, grounding, review_queue
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW, CONTENT = ROOT / "raw", ROOT / "content"
@@ -42,34 +42,73 @@ def normalize_xbrl_edge(e: dict) -> dict:
             "from_structured": e.get("from_structured", False)}
 
 
+def _all_text(raw: dict) -> str:
+    return "\n".join(raw.get("sections", {}).values())
+
+
+def _minimax_client():
+    """A reusable MiniMax client for grounding, or None when no key is configured (tests stub
+    grounding.grounding_ok so the client is never used there)."""
+    if not os.environ.get("MINIMAX_API_KEY"):
+        return None
+    from openai import OpenAI
+    return OpenAI(api_key=os.environ["MINIMAX_API_KEY"],
+                  base_url=os.environ.get("MINIMAX_BASE_URL", "https://api.minimaxi.com/v1"))
+
+
 def process_source(raw: dict, today: str) -> None:
-    facts, edges = [], []
+    """M2a: anchor (Claude) + second vote (MiniMax) → ontology guard → merge_votes →
+    grounding (narrative only) → score → low/conflict to review queue → content."""
+    facts, structured = [], []
     if raw["form"] in ("10-K", "10-Q"):
         try:
             f, e = leg_xbrl.extract(raw)
             facts += [{**x, "entity": "nvidia"} for x in f]
-            edges += [normalize_xbrl_edge(x) for x in e]
+            structured += [normalize_xbrl_edge(x) for x in e]
         except ValueError as exc:
             print(f"[extract_consensus] XBRL leg skipped for {raw['source_id']}: {exc}",
                   file=sys.stderr)
-    edges += [normalize_triple(t)
-              for t in anchor_claude.extract_source(raw, checkpoint_dir=RAW / "_partial")]
-    for e in edges:
-        e["confidence"] = score_m1(e)
+
+    narrative = [normalize_triple(t)
+                 for t in anchor_claude.extract_source(raw, checkpoint_dir=RAW / "_partial")]
+    narrative += [normalize_triple(t) for t in second_minimax.extract_source(raw)]
+
+    # Ontology domain/range guard BEFORE voting (drop violations; never enter content/queue)
     predicates = load_predicates()
-    valid_edges = []
-    for e in edges:
+    valid = []
+    for e in narrative + structured:
         ok, reason = edge_satisfies_ontology(e, predicates)
         if ok:
-            valid_edges.append(e)
+            valid.append(e)
         else:
-            print(f"DROP {e['subject']} {e['predicate']} {e['target']}: {reason}",
-                  file=sys.stderr)
-    update_content.apply(CONTENT, edges=valid_edges, facts=facts, today=today,
+            print(f"DROP {e['subject']} {e['predicate']} {e['target']}: {reason}", file=sys.stderr)
+
+    by = consensus.merge_votes(valid)
+    client = _minimax_client()
+    text = _all_text(raw)
+    edges, queue_items = [], []
+    for rec in by.values():
+        e = dict(rec["edge"])
+        e["extractors"] = sorted(set(rec["extractors"]))      # union; human never relabeled (#8)
+        if rec["from_structured"]:
+            e["confidence"] = "high"                           # XBRL: trusted, no grounding
+        else:
+            ev = rec["evidence"][0]["text"] if rec["evidence"] else ""
+            g_ok = grounding.grounding_ok(ev, text, e, client=client)
+            e["confidence"] = consensus.score(rec, g_ok)
+            if e["confidence"] == "low":
+                queue_items.append({"kind": "low", "subject": e["subject"], "predicate": e["predicate"],
+                                    "candidates": [{"target": e["target"], "extractors": e["extractors"],
+                                                    "sources": sorted(rec["sources"]),
+                                                    "evidence": rec["evidence"]}]})
+        edges.append(e)
+
+    update_content.apply(CONTENT, edges=edges, facts=facts, today=today,
                          source_meta={"id": raw["source_id"], "kind": "sec-filing",
                                       "title": f"NVIDIA {raw['form']} {raw['filing_date']}",
                                       "url": raw["url"], "date": raw["filing_date"],
                                       "accession": raw["accession"]})
+    review_queue.append_items(ROOT / "review_queue.md", queue_items, today=today)
 
 
 def run(today: str | None = None) -> list[str]:
