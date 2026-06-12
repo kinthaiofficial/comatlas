@@ -16,7 +16,7 @@ def test_idempotent_no_duplicate(tmp_path):
     p = tmp_path / "review_queue.md"
     rq.append_items(p, [ITEM], today="2026-06-12")
     rq.append_items(p, [ITEM], today="2026-06-13")          # same item again, later day
-    assert p.read_text().count("data-center") == 1          # appended once
+    assert p.read_text().count("<!-- RQ:low:nvidia:IN_SEGMENT:data-center -->") == 1   # one block
 
 
 def test_distinct_items_both_appended(tmp_path):
