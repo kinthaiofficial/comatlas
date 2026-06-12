@@ -84,6 +84,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as Advanced Micro Devices, Inc., or AMD, Huawei Technologies Co. Ltd.,
     or Huawei, and …
@@ -95,6 +96,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … Devices, Inc., or AMD, Huawei Technologies Co. Ltd., or Huawei, and Intel
     Corporation, or Intel;
@@ -106,6 +108,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … as Advanced Micro Devices, Inc., or AMD, Huawei Technologies Co. Ltd.,
     or Huawei, and Intel …
@@ -117,6 +120,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc., Huawei, and
     Microsoft Corporation, or Microsoft;
@@ -128,6 +132,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc.,
     Huawei, and Microsoft …
@@ -139,6 +144,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc.,
     Huawei, and Microsoft …
@@ -150,6 +156,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as Ambarella, Inc., AMD, Broadcom, Intel, Qualcomm Incorporated, Renesas
     Electronics Corporation, and Samsung, or …
@@ -161,6 +168,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as Ambarella, Inc., AMD, Broadcom, Intel, Qualcomm Incorporated, Renesas
     Electronics Corporation, and Samsung, or …
@@ -172,6 +180,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … internal teams designing SoC products for their own products and services,
     such as Tesla, Inc.
@@ -183,6 +192,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as Alibaba Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc.,
     Huawei, and Microsoft …
@@ -194,6 +204,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard
     Enterprise Company, Huawei, Intel, …
@@ -205,6 +216,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: such as AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard
     Enterprise Company, Huawei, Intel, …
@@ -216,6 +228,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … AMD, Arista Networks, Broadcom, Cisco Systems, Inc., Hewlett Packard Enterprise
     Company, Huawei, Intel, Lumentum Holdings …
@@ -227,6 +240,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … Company, Huawei, Intel, Lumentum Holdings Inc., and Marvell Technology,
     Inc, as well as internal teams …
@@ -238,6 +252,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … Ambarella, Inc., AMD, Broadcom, Intel, Qualcomm Incorporated, Renesas Electronics
     Corporation, and Samsung, or companies with …
@@ -249,6 +264,7 @@ relations:
   extractors:
   - claude
   - human
+  - minimax
   predicate: COMPETES_WITH
   quote: … Group, Alphabet Inc., Amazon, Inc., or Amazon, Baidu, Inc., Huawei, and
     Microsoft Corporation, or Microsoft;
@@ -259,6 +275,7 @@ relations:
   corroborates: []
   extractors:
   - claude
+  - minimax
   predicate: COMPETES_WITH
   quote: such as Ambarella, Inc., AMD, Broadcom, Intel, Qualcomm Incorporated, Renesas
     Electronics Corporation, and Samsung, or …
@@ -269,6 +286,7 @@ relations:
   corroborates: []
   extractors:
   - claude
+  - minimax
   predicate: COMPETES_WITH
   quote: … Intel, Qualcomm Incorporated, Renesas Electronics Corporation, and Samsung,
     or companies with internal teams designing SoC …
@@ -279,6 +297,7 @@ relations:
   corroborates: []
   extractors:
   - claude
+  - minimax
   predicate: COMPETES_WITH
   quote: … Inc., Hewlett Packard Enterprise Company, Huawei, Intel, Lumentum Holdings
     Inc., and Marvell Technology, Inc, as …
@@ -289,6 +308,7 @@ relations:
   corroborates: []
   extractors:
   - claude
+  - minimax
   predicate: PARTNER_WITH
   quote: execution of a non-exclusive license agreement with Groq
   source: nvda-10k-2026-02-25
