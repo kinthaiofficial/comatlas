@@ -57,6 +57,11 @@ def lint_dir(content: Path) -> list[str]:
             tgt = pages.get(r["target"])
             if tgt and tgt.metadata.get("type") not in spec["range"]:
                 e(f"{w}: target type {tgt.metadata.get('type')} violates range({r['predicate']})")
+            q = r.get("quote")
+            if q is not None:
+                qwords = [tok for tok in str(q).split() if tok != "…"]
+                if len(qwords) > 15:
+                    e(f"{w}: quote exceeds 15 words ({len(qwords)}) — red line #5")
         for i, f in enumerate(m.get("facts") or []):
             missing = FACT_REQUIRED - set(f)
             if missing:

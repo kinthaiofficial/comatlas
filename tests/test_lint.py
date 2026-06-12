@@ -109,3 +109,16 @@ def test_lint_dir_no_entities_subdir(tmp_path):
     # A tmp dir without entities/ should return [] without crashing
     errs = lint_dir(tmp_path)
     assert errs == []
+
+
+# ── M2.5 Wiki: quote length (red line #5 machine-enforced) ───────────────────
+def test_quote_over_15_words_fails_lint(tmp_path):
+    long_q = " ".join(["w"] * 16)
+    rel = REL_OK + f"\n    quote: {long_q}"
+    errs = lint_dir(setup(tmp_path, page(rel)))
+    assert any("quote" in e and "15" in e for e in errs)
+
+def test_quote_within_15_words_passes(tmp_path):
+    rel = REL_OK + "\n    quote: We purchase memory from SK Hynix Micron and Samsung"
+    errs = lint_dir(setup(tmp_path, page(rel)))
+    assert not any("quote" in e for e in errs)
