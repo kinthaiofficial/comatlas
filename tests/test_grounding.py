@@ -37,3 +37,14 @@ def test_grounding_ok_requires_presence_and_entailment():
     assert not g.grounding_ok("NVIDIA acquired TSMC in 2025", TEXT, EDGE, client=FakeMM(True))
     # presence ok but judge says not supported -> low
     assert not g.grounding_ok("NVIDIA relies on TSMC to manufacture", TEXT, EDGE, client=FakeMM(False))
+
+
+def test_context_window_includes_framing_around_fragment():
+    src = "Our current competitors include: ... such as AMD, Huawei, and Intel; and others follow."
+    frag = "such as AMD, Huawei, and Intel;"
+    ctx = g._context(frag, src, window=40)
+    assert "competitors include" in ctx and "AMD" in ctx          # framing recovered for the judge
+
+
+def test_context_falls_back_to_evidence_when_absent():
+    assert g._context("not in source at all", "totally different text") == "not in source at all"
