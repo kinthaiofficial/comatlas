@@ -158,3 +158,33 @@ def test_auto_block_renders_basis_column(tmp_path):
     uc.apply(tmp_path, edges=[QEDGE], facts=[], source_meta=SRC, today="2026-06-12")
     auto = (tmp_path / "entities" / "nvidia.md").read_text().split("AUTO-RELATIONS:BEGIN")[1]
     assert "basis" in auto and "TSMC" in auto
+
+
+# ── M2.5 Wiki: managed SUMMARY block ─────────────────────────────────────────
+def test_summary_block_rendered_and_flagged(tmp_path):
+    uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-12",
+             summaries={"nvidia": "NVIDIA designs accelerated computing platforms."})
+    post = frontmatter.load(tmp_path / "entities" / "nvidia.md")
+    assert post.metadata.get("summary_by") == "claude"
+    assert "SUMMARY:BEGIN" in post.content and "accelerated computing platforms" in post.content
+    assert post.content.index("SUMMARY:BEGIN") < post.content.index("AUTO-RELATIONS:BEGIN")
+
+def test_summary_only_entity_without_edges(tmp_path):
+    uc.apply(tmp_path, edges=[], facts=[], source_meta=SRC, today="2026-06-12",
+             summaries={"nvidia": "Standalone summary."})
+    post = frontmatter.load(tmp_path / "entities" / "nvidia.md")
+    assert "Standalone summary." in post.content and post.metadata.get("summary_by") == "claude"
+
+def test_handwritten_prose_between_blocks_preserved(tmp_path):
+    uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-12",
+             summaries={"nvidia": "First summary."})
+    p = tmp_path / "entities" / "nvidia.md"
+    post = frontmatter.load(p)
+    post.content = post.content.replace("<!-- SUMMARY:END -->",
+                                        "<!-- SUMMARY:END -->\n\nHUMAN NOTE: verify Groq deal.", 1)
+    p.write_text(frontmatter.dumps(post) + "\n")
+    uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-13",
+             summaries={"nvidia": "Second summary."})
+    final = (tmp_path / "entities" / "nvidia.md").read_text()
+    assert "HUMAN NOTE: verify Groq deal." in final
+    assert "Second summary." in final and "First summary." not in final

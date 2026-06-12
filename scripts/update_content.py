@@ -10,6 +10,8 @@ from scripts.quote import short_quote
 
 AUTO_BEGIN = "<!-- AUTO-RELATIONS:BEGIN -->"
 AUTO_END = "<!-- AUTO-RELATIONS:END -->"
+SUMMARY_BEGIN = "<!-- SUMMARY:BEGIN -->"
+SUMMARY_END = "<!-- SUMMARY:END -->"
 RANK = {"low": 0, "medium": 1, "high": 2}
 
 
@@ -128,7 +130,19 @@ def _rewrite_body(post: frontmatter.Post, page_id: str = "") -> str:
     return f"{head}{AUTO_BEGIN}\n{_render_auto_block(post.metadata)}\n{AUTO_END}{tail}"
 
 
-def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: str) -> None:
+def _rewrite_summary(post: frontmatter.Post, text: str) -> str:
+    """Upsert the managed SUMMARY block at the top of the body, preserving everything else."""
+    block = f"{SUMMARY_BEGIN}\n{text.strip()}\n{SUMMARY_END}"
+    body = post.content
+    if SUMMARY_BEGIN in body and SUMMARY_END in body:
+        head, rest = body.split(SUMMARY_BEGIN, 1)
+        _, tail = rest.split(SUMMARY_END, 1)
+        return f"{head}{block}{tail}"
+    return f"{block}\n\n{body}"
+
+
+def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: str,
+          summaries: dict | None = None) -> None:
     """Merge edges and facts into entity pages; create stub pages and source pages as needed.
 
     Args:
@@ -139,6 +153,7 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
         today:       ISO date string "YYYY-MM-DD" for last_updated.
     """
     content = Path(content)
+    summaries = summaries or {}
     _ensure_source_page(content, source_meta)
 
     # Accumulate all pages to write (subject + target from edges, entity from facts)
@@ -169,6 +184,11 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
             "unit": fact.get("unit", ""),
         })
 
+    # Entities that only get a summary this run (no edges/facts) still need writing
+    for eid in summaries:
+        if eid not in touched:
+            touched[eid] = _stub(content, eid, "Company", eid, today)
+
     for eid, post in touched.items():
         m = post.metadata
         m["last_updated"] = today
@@ -177,4 +197,7 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
         # Publish gate: low-confidence pages must not be published (red line #3)
         m["publish"] = m.get("confidence") != "low"
         post.content = _rewrite_body(post, page_id=eid)
+        if eid in summaries:
+            m["summary_by"] = "claude"
+            post.content = _rewrite_summary(post, summaries[eid])
         _dump(post, content / "entities" / f"{eid}.md")
