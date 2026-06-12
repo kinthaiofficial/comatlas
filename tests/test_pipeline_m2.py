@@ -110,3 +110,36 @@ def test_functional_conflict_routed_to_queue_not_published(tmp_path, monkeypatch
         assert not any(r["predicate"] == "SUBSIDIARY_OF" for r in rels)   # conflicting edge not published
     rq = (tmp_path / "review_queue.md").read_text()
     assert "conflict" in rq and "SUBSIDIARY_OF" in rq                     # surfaced for human arbitration
+
+
+def _seed_entity(tmp_path, eid):
+    d = tmp_path / "content" / "entities"; d.mkdir(parents=True, exist_ok=True)
+    (d / f"{eid}.md").write_text(
+        f"---\ntype: Company\nid: {eid}\nlabel: {eid}\naliases: [{eid}]\nconfidence: medium\n"
+        f"publish: true\nlast_updated: '2026-06-13'\nsources: []\nrelations: []\n---\n"
+        "<!-- AUTO-RELATIONS:BEGIN -->\n<!-- AUTO-RELATIONS:END -->\n")
+
+
+def test_wikidata_corroborates_existing_entities_only(tmp_path, monkeypatch):
+    _seed_entity(tmp_path, "mellanox"); _seed_entity(tmp_path, "nvidia")
+    wiki = [{"subject": "Mellanox", "subject_type": "Company", "object": "NVIDIA", "object_type": "Company",
+             "predicate": "SUBSIDIARY_OF", "as_of": "2026-Q1", "evidence": "Wikidata P355",
+             "source": "wikidata-q182477", "extractor": "wikidata", "from_structured": True},
+            {"subject": "Obscure Sub", "subject_type": "Company", "object": "NVIDIA", "object_type": "Company",
+             "predicate": "SUBSIDIARY_OF", "as_of": "2026-Q1", "evidence": "Wikidata P355",
+             "source": "wikidata-q182477", "extractor": "wikidata", "from_structured": True}]
+    _setup(tmp_path, monkeypatch, [], [])
+    monkeypatch.setattr(pipe.leg_wikidata, "extract", lambda as_of="2026-Q1": wiki)
+    pipe.run(today="2026-06-13")
+    mel = frontmatter.load(tmp_path / "content" / "entities" / "mellanox.md")
+    subs = [r for r in mel.metadata.get("relations") or [] if r["predicate"] == "SUBSIDIARY_OF"]
+    assert any(r["target"] == "nvidia" and r["confidence"] == "high" for r in subs)   # structured -> high
+    assert any("wikidata" in r["extractors"] for r in subs)
+    assert not (tmp_path / "content" / "entities" / "obscure-sub.md").exists()         # new entity filtered out
+
+
+def test_wikidata_outage_is_tolerated(tmp_path, monkeypatch):
+    _setup(tmp_path, monkeypatch, [_triple("claude")], [])
+    def _boom(as_of="2026-Q1"): raise RuntimeError("429 rate limited")
+    monkeypatch.setattr(pipe.leg_wikidata, "extract", _boom)
+    assert pipe.run(today="2026-06-13") == ["nvda-10k-2026-02-26"]      # WDQS down doesn't break the run

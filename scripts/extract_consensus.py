@@ -11,7 +11,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from scripts.extract import anchor_claude, leg_xbrl, second_minimax
+from scripts.extract import anchor_claude, leg_xbrl, second_minimax, leg_wikidata
 from scripts.normalize import normalize_surface
 from scripts.ontology import load_predicates, edge_satisfies_ontology
 from scripts import update_content, consensus, grounding, review_queue
@@ -72,6 +72,19 @@ def process_source(raw: dict, today: str) -> None:
         except ValueError as exc:
             print(f"[extract_consensus] XBRL leg skipped for {raw['source_id']}: {exc}",
                   file=sys.stderr)
+
+    # Wikidata structural leg (once, on the annual report). Corroboration-only: keep edges only
+    # between entities we already track, so curated-but-broad Wikidata can't introduce new nodes.
+    # Resilient to WDQS outages/rate-limits (skip on any error).
+    if raw["form"] == "10-K":
+        try:
+            existing = {p.stem for p in (CONTENT / "entities").glob("*.md")}
+            for t in leg_wikidata.extract(as_of=raw["as_of"]):
+                ne = normalize_triple(t)
+                if ne["subject"] in existing and ne["target"] in existing:
+                    structured.append(ne)
+        except Exception as exc:
+            print(f"[wikidata] leg skipped: {str(exc)[:120]}", file=sys.stderr)
 
     narrative = [normalize_triple(t)
                  for t in anchor_claude.extract_source(raw, checkpoint_dir=RAW / "_partial")]
