@@ -74,3 +74,22 @@ def test_human_gold_plus_claude_unions_provenance(tmp_path, monkeypatch):
                         lambda raw, runner=None, checkpoint_dir=None: [_triple("claude")])
     pipe.run(today="2026-06-13")
     assert set(_rel(tmp_path)["extractors"]) == {"claude", "human"}   # union, human preserved (#8)
+
+
+def test_minimax_only_edge_queued_not_published(tmp_path, monkeypatch):
+    mm_only = {"subject": "NVIDIA", "subject_type": "Company", "predicate": "PARTNER_WITH",
+               "object": "Acme Corp", "object_type": "Company", "evidence": "Acme partners with NVIDIA.",
+               "as_of": "2026-Q1", "source": "nvda-10k-2026-02-26", "extractor": "minimax"}
+    _setup(tmp_path, monkeypatch, [], [mm_only])
+    pipe.run(today="2026-06-12")
+    assert not (tmp_path / "content" / "entities" / "acme-corp.md").exists()   # no junk entity page
+    rq = (tmp_path / "review_queue.md").read_text()
+    assert "weak-only" in rq and "PARTNER_WITH" in rq                          # surfaced, not published
+
+
+def test_human_edge_published_despite_grounding_false(tmp_path, monkeypatch):
+    _setup(tmp_path, monkeypatch, [_triple("human")], [], grounding_ok=False)
+    pipe.run(today="2026-06-12")
+    r = _rel(tmp_path)
+    assert r is not None and r["confidence"] != "low"    # human authoritative — grounding bypassed
+    assert "human" in r["extractors"]

@@ -19,6 +19,10 @@ from scripts import update_content, consensus, grounding, review_queue
 ROOT = Path(__file__).resolve().parents[1]
 RAW, CONTENT = ROOT / "raw", ROOT / "content"
 
+# Anchors define the canonical graph; MiniMax/GLiREL only VOTE. An edge with no anchor support
+# (claude/human/xbrl/wikidata) is never published — it goes to the review queue (design §5.1, FR-8).
+ANCHOR_EXTRACTORS = {"claude", "human", "xbrl", "wikidata"}
+
 
 def normalize_triple(t: dict) -> dict:
     """Anchor triple (subject/object surfaces) -> canonical edge dict."""
@@ -87,20 +91,28 @@ def process_source(raw: dict, today: str) -> None:
     client = _minimax_client()
     text = _all_text(raw)
     edges, queue_items = [], []
+
+    def _queue(kind, e, rec):
+        queue_items.append({"kind": kind, "subject": e["subject"], "predicate": e["predicate"],
+                            "candidates": [{"target": e["target"], "extractors": e["extractors"],
+                                            "sources": sorted(rec["sources"]), "evidence": rec["evidence"]}]})
+
     for rec in by.values():
         e = dict(rec["edge"])
         e["extractors"] = sorted(set(rec["extractors"]))      # union; human never relabeled (#8)
+        anchored = bool(set(e["extractors"]) & ANCHOR_EXTRACTORS)
         if rec["from_structured"]:
-            e["confidence"] = "high"                           # XBRL: trusted, no grounding
+            e["confidence"] = "high"                           # XBRL/Wikidata: trusted, no grounding
+        elif "human" in e["extractors"]:
+            e["confidence"] = consensus.score(rec, True)       # human is authoritative — bypass grounding
+        elif not anchored:
+            _queue("weak-only", e, rec)                        # MiniMax/GLiREL only: a vote, not an anchor
+            continue                                            # never enters content (no stub page)
         else:
-            ev = rec["evidence"][0]["text"] if rec["evidence"] else ""
-            g_ok = grounding.grounding_ok(ev, text, e, client=client)
-            e["confidence"] = consensus.score(rec, g_ok)
+            e["confidence"] = consensus.score(rec, grounding.grounding_ok(
+                rec["evidence"][0]["text"] if rec["evidence"] else "", text, e, client=client))
             if e["confidence"] == "low":
-                queue_items.append({"kind": "low", "subject": e["subject"], "predicate": e["predicate"],
-                                    "candidates": [{"target": e["target"], "extractors": e["extractors"],
-                                                    "sources": sorted(rec["sources"]),
-                                                    "evidence": rec["evidence"]}]})
+                _queue("low", e, rec)
         edges.append(e)
 
     update_content.apply(CONTENT, edges=edges, facts=facts, today=today,
