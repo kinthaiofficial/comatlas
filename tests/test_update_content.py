@@ -188,3 +188,13 @@ def test_handwritten_prose_between_blocks_preserved(tmp_path):
     final = (tmp_path / "entities" / "nvidia.md").read_text()
     assert "HUMAN NOTE: verify Groq deal." in final
     assert "Second summary." in final and "First summary." not in final
+
+
+# ── M2.5 Wiki: clickable source (new tab) + basis deep-link (text fragment) ───
+def test_source_external_newtab_and_basis_deeplink(tmp_path):
+    uc.apply(tmp_path, edges=[QEDGE], facts=[], source_meta=SRC, today="2026-06-12")
+    auto = (tmp_path / "entities" / "nvidia.md").read_text().split("AUTO-RELATIONS:BEGIN")[1]
+    assert 'target="_blank"' in auto and 'rel="noopener"' in auto
+    assert 'href="https://x"' in auto          # source cell -> external SEC url
+    assert "#:~:text=" in auto                  # basis cell -> text-fragment deep link
+    assert "[[sources/" not in auto             # broken table-pipe wikilink is gone

@@ -31,5 +31,5 @@ Wistron Corporation is a contract manufacturer. NVIDIA's FY2026 10-K lists it am
 <!-- AUTO-RELATIONS:BEGIN -->
 | relation | target | as of | confidence | basis | source |
 |---|---|---|---|---|---|
-| SUPPLIES | [[nvidia]] | 2026-Q1 | medium | We engage with independent subcontractors and contract manufacturers such as Hon Hai Precision Industry Co., … | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| SUPPLIES | [[nvidia]] | 2026-Q1 | medium | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm#:~:text=We%20engage%20with%20independent%20subcontractors%20and%20contract%20manufacturers%20such%20as%20Hon%20Hai%20Precision%20Industry%20Co.%2C" target="_blank" rel="noopener">We engage with independent subcontractors and contract manufacturers such as Hon Hai Precision Industry Co., …</a> | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
 <!-- AUTO-RELATIONS:END -->

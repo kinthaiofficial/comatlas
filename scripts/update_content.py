@@ -5,6 +5,7 @@ look like ISO dates (e.g. '2026-06-07' → YAML single-quoted string). On load, 
 YAML strings are returned as Python str, so last_updated round-trips correctly as a string.
 """
 from pathlib import Path
+import urllib.parse
 import frontmatter
 from scripts.quote import short_quote
 
@@ -82,8 +83,39 @@ def _merge_edge(meta: dict, e: dict) -> None:
     })
 
 
-def _render_auto_block(meta: dict) -> str:
+def _source_cell(sid: str, source_urls: dict) -> str:
+    """Source link → opens the original filing in a new tab. Falls back to the internal
+    source page only when no external url is known. HTML (no '|') so it can't break the table."""
+    url = source_urls.get(sid, "")
+    if url:
+        return f'<a href="{_esc(url)}" target="_blank" rel="noopener">{sid}</a>'
+    return f"[[sources/{sid}|{sid}]]"
+
+
+def _basis_cell(quote: str, sid: str, source_urls: dict) -> str:
+    """Basis link → deep-links into the filing at the cited text via a URL text fragment
+    (#:~:text=...). The quote minus ellipsis is a contiguous substring of the source, so the
+    browser scrolls to and highlights it. Falls back to plain text when no url/quote."""
+    quote = quote or ""
+    safe_text = quote.replace("|", "\\|")
+    url = source_urls.get(sid, "")
+    if not (quote and url):
+        return safe_text
+    frag = " ".join(quote.replace(ELLIPSIS, " ").split())   # contiguous exact substring
+    href = f"{url}#:~:text={urllib.parse.quote(frag, safe='')}"
+    return f'<a href="{_esc(href)}" target="_blank" rel="noopener">{safe_text}</a>'
+
+
+def _esc(s: str) -> str:
+    return s.replace('"', "%22")
+
+
+ELLIPSIS = "…"
+
+
+def _render_auto_block(meta: dict, source_urls: dict | None = None) -> str:
     """Render the markdown table for relations and facts (low-confidence edges excluded)."""
+    source_urls = source_urls or {}
     rows = [
         "| relation | target | as of | confidence | basis | source |",
         "|---|---|---|---|---|---|",
@@ -91,10 +123,10 @@ def _render_auto_block(meta: dict) -> str:
     for r in meta.get("relations") or []:
         if r["confidence"] == "low":
             continue  # Red line #3: low-confidence edges never rendered
-        basis = (r.get("quote") or "").replace("|", "\\|")
         rows.append(
             f"| {r['predicate']} | [[{r['target']}]] | {r['as_of']}"
-            f" | {r['confidence']} | {basis} | [[sources/{r['source']}|{r['source']}]] |"
+            f" | {r['confidence']} | {_basis_cell(r.get('quote'), r['source'], source_urls)}"
+            f" | {_source_cell(r['source'], source_urls)} |"
         )
 
     facts = meta.get("facts") or []
@@ -107,12 +139,12 @@ def _render_auto_block(meta: dict) -> str:
         for f in facts:
             rows.append(
                 f"| {f['metric']} | {f['value']:,} {f.get('unit', '')} | {f['period']}"
-                f" | [[sources/{f['source']}|{f['source']}]] |"
+                f" | {_source_cell(f['source'], source_urls)} |"
             )
     return "\n".join(rows)
 
 
-def _rewrite_body(post: frontmatter.Post, page_id: str = "") -> str:
+def _rewrite_body(post: frontmatter.Post, page_id: str = "", source_urls: dict | None = None) -> str:
     """Replace the AUTO block in the body while preserving hand-written prose."""
     body = post.content
     if AUTO_BEGIN not in body:
@@ -127,7 +159,7 @@ def _rewrite_body(post: frontmatter.Post, page_id: str = "") -> str:
         )
     head, rest = body.split(AUTO_BEGIN, 1)
     _, tail = rest.split(AUTO_END, 1)
-    return f"{head}{AUTO_BEGIN}\n{_render_auto_block(post.metadata)}\n{AUTO_END}{tail}"
+    return f"{head}{AUTO_BEGIN}\n{_render_auto_block(post.metadata, source_urls)}\n{AUTO_END}{tail}"
 
 
 def _rewrite_summary(post: frontmatter.Post, text: str) -> str:
@@ -155,6 +187,11 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
     content = Path(content)
     summaries = summaries or {}
     _ensure_source_page(content, source_meta)
+
+    # Map source id -> original document url (for clickable source + basis deep-links)
+    sources_dir = content / "sources"
+    source_urls = {p.stem: (frontmatter.load(p).metadata.get("url") or "")
+                   for p in sources_dir.glob("*.md")} if sources_dir.is_dir() else {}
 
     # Accumulate all pages to write (subject + target from edges, entity from facts)
     touched: dict[str, frontmatter.Post] = {}
@@ -196,7 +233,7 @@ def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: 
             m["sources"].append(source_meta["id"])
         # Publish gate: low-confidence pages must not be published (red line #3)
         m["publish"] = m.get("confidence") != "low"
-        post.content = _rewrite_body(post, page_id=eid)
+        post.content = _rewrite_body(post, page_id=eid, source_urls=source_urls)
         if eid in summaries:
             m["summary_by"] = "claude"
             post.content = _rewrite_summary(post, summaries[eid])

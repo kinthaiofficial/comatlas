@@ -32,5 +32,5 @@ Compute & Networking is one of NVIDIA's two reported operating segments, coverin
 <!-- AUTO-RELATIONS:BEGIN -->
 | relation | target | as of | confidence | basis | source |
 |---|---|---|---|---|---|
-| IN_SEGMENT | [[nvidia]] | 2026-Q2 | high | XBRL reportable segment: Compute & Networking | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| IN_SEGMENT | [[nvidia]] | 2026-Q2 | high | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm#:~:text=XBRL%20reportable%20segment%3A%20Compute%20%26%20Networking" target="_blank" rel="noopener">XBRL reportable segment: Compute & Networking</a> | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
 <!-- AUTO-RELATIONS:END -->
