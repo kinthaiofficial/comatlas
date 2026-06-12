@@ -140,3 +140,21 @@ def test_malformed_auto_block_raises(tmp_path):
 
     with pytest.raises(ValueError, match="nvidia"):
         uc.apply(tmp_path, edges=[EDGE], facts=[], source_meta=SRC, today="2026-06-07")
+
+
+# ── M2.5 Wiki: evidence short-quote ──────────────────────────────────────────
+LONG_EV = ("We utilize foundries, such as Taiwan Semiconductor Manufacturing Company Limited, or TSMC, "
+           "and Samsung Electronics Co., Ltd., or Samsung, to produce our semiconductor wafers.")
+QEDGE = {**EDGE, "target_label": "TSMC", "evidence": LONG_EV}
+
+def test_edge_persists_short_quote(tmp_path):
+    uc.apply(tmp_path, edges=[QEDGE], facts=[], source_meta=SRC, today="2026-06-12")
+    r = next(r for r in frontmatter.load(tmp_path / "entities" / "nvidia.md")["relations"]
+             if r["target"] == "tsmc")
+    quoted = [w for w in r["quote"].split() if w != "…"]
+    assert len(quoted) <= 15 and "TSMC" in r["quote"]
+
+def test_auto_block_renders_basis_column(tmp_path):
+    uc.apply(tmp_path, edges=[QEDGE], facts=[], source_meta=SRC, today="2026-06-12")
+    auto = (tmp_path / "entities" / "nvidia.md").read_text().split("AUTO-RELATIONS:BEGIN")[1]
+    assert "basis" in auto and "TSMC" in auto

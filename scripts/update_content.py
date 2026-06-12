@@ -6,6 +6,7 @@ YAML strings are returned as Python str, so last_updated round-trips correctly a
 """
 from pathlib import Path
 import frontmatter
+from scripts.quote import short_quote
 
 AUTO_BEGIN = "<!-- AUTO-RELATIONS:BEGIN -->"
 AUTO_END = "<!-- AUTO-RELATIONS:END -->"
@@ -62,6 +63,9 @@ def _merge_edge(meta: dict, e: dict) -> None:
             # Raise confidence only if new edge is higher
             if RANK[e["confidence"]] > RANK[r["confidence"]]:
                 r["confidence"] = e["confidence"]
+            # Backfill the evidence short-quote if missing and this edge supplies evidence
+            if not r.get("quote") and e.get("evidence"):
+                r["quote"] = short_quote(e["evidence"], e.get("target_label", ""))
             return
     # New edge
     meta["relations"].append({
@@ -72,21 +76,23 @@ def _merge_edge(meta: dict, e: dict) -> None:
         "confidence": e["confidence"],
         "extractors": list(e["extractors"]),
         "corroborates": [],
+        "quote": short_quote(e.get("evidence", ""), e.get("target_label", "")),
     })
 
 
 def _render_auto_block(meta: dict) -> str:
     """Render the markdown table for relations and facts (low-confidence edges excluded)."""
     rows = [
-        "| relation | target | as of | confidence | source |",
-        "|---|---|---|---|---|",
+        "| relation | target | as of | confidence | basis | source |",
+        "|---|---|---|---|---|---|",
     ]
     for r in meta.get("relations") or []:
         if r["confidence"] == "low":
             continue  # Red line #3: low-confidence edges never rendered
+        basis = (r.get("quote") or "").replace("|", "\\|")
         rows.append(
             f"| {r['predicate']} | [[{r['target']}]] | {r['as_of']}"
-            f" | {r['confidence']} | [[sources/{r['source']}|{r['source']}]] |"
+            f" | {r['confidence']} | {basis} | [[sources/{r['source']}|{r['source']}]] |"
         )
 
     facts = meta.get("facts") or []
