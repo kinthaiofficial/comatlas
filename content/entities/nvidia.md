@@ -53,7 +53,7 @@ facts:
   value: 22459000000
 id: nvidia
 label: nvidia
-last_updated: '2026-06-11'
+last_updated: '2026-06-12'
 publish: true
 relations:
 - as_of: 2026-Q1
@@ -253,34 +253,39 @@ relations:
 sources:
 - nvda-10k-2026-02-25
 - nvda-10q-2026-05-20
+summary_by: claude
 type: Company
 ---
 
+<!-- SUMMARY:BEGIN -->
+NVIDIA is an accelerated-computing and AI-infrastructure company; per its FY2026 Form 10-K it reported about $215.9B in revenue across two operating segments, Compute & Networking and Graphics. It follows a fabless model, designing chips and systems while outsourcing wafer fabrication and assembly to third parties. Relationships below are drawn from that filing.
+<!-- SUMMARY:END -->
+
 <!-- AUTO-RELATIONS:BEGIN -->
-| relation | target | as of | confidence | source |
-|---|---|---|---|---|
-| MANUFACTURED_BY | [[tsmc]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| MANUFACTURED_BY | [[samsung]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[amd]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[intel]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[huawei]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[microsoft]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[amazon]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[alphabet]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[broadcom]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[qualcomm]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[tesla]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[alibaba]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[arista]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[cisco]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[hpe]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[marvell]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[renesas]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[baidu]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[ambarella]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[samsung]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| COMPETES_WITH | [[lumentum]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
-| PARTNER_WITH | [[groq]] | 2026-Q1 | medium | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| relation | target | as of | confidence | basis | source |
+|---|---|---|---|---|---|
+| MANUFACTURED_BY | [[tsmc]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| MANUFACTURED_BY | [[samsung]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[amd]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[intel]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[huawei]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[microsoft]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[amazon]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[alphabet]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[broadcom]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[qualcomm]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[tesla]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[alibaba]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[arista]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[cisco]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[hpe]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[marvell]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[renesas]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[baidu]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[ambarella]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[samsung]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| COMPETES_WITH | [[lumentum]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
+| PARTNER_WITH | [[groq]] | 2026-Q1 | medium |  | [[sources/nvda-10k-2026-02-25|nvda-10k-2026-02-25]] |
 
 | metric | value | period | source |
 |---|---|---|---|

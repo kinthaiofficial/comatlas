@@ -4,15 +4,20 @@ aliases:
 confidence: medium
 id: huawei
 label: huawei
-last_updated: '2026-06-11'
+last_updated: '2026-06-12'
 publish: true
 relations: []
 sources:
 - nvda-10k-2026-02-25
+summary_by: claude
 type: Company
 ---
 
+<!-- SUMMARY:BEGIN -->
+Huawei is a technology and telecommunications company. NVIDIA's FY2026 10-K names it among NVIDIA's competitors in accelerated computing, internal-silicon cloud solutions and networking.
+<!-- SUMMARY:END -->
+
 <!-- AUTO-RELATIONS:BEGIN -->
-| relation | target | as of | confidence | source |
-|---|---|---|---|---|
+| relation | target | as of | confidence | basis | source |
+|---|---|---|---|---|---|
 <!-- AUTO-RELATIONS:END -->
