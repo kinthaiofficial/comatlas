@@ -62,6 +62,7 @@ confidence: high           # high | medium | low
 authority: official        # official | inferred
 publish: true              # 发布闸门（新增 v2）：low 置信页面必须 false（lint 强制）
 last_updated: 2026-06-07   # 字符串形式（非 YAML 日期）
+summary_by: claude         # 可选（M2.5）：页面含机器生成简介块时标注，对读者透明
 sources: [nvda-10k-2026-02-25]
 relations:
   - predicate: MANUFACTURED_BY   # ∈ 谓词封闭集（含 domain/range 守卫）
@@ -71,6 +72,7 @@ relations:
     valid_to: null               # 可选
     source: nvda-10k-2026-02-25  # 必须，且必须解析到 content/sources/ 下的来源页
     corroborates: []             # 可选：其他印证来源 id 列表（新增 v2）
+    quote: "…such as … TSMC …"   # 可选（M2.5）：≤15 词年报短引；lint 强制 ≤15 词（红线 #5）
     confidence: high
     extractors: [claude, xbrl]   # ∈ {claude, minimax, glirel, xbrl, human, wikidata}
                                  # human = 人工核实/金种子；绝不把人工标注改写为 LLM 抽取器
@@ -83,7 +85,7 @@ facts:                           # 新增 v2：XBRL 数值事实列表
     confidence: high
     extractors: [xbrl]
 ---
-（英文正文，含 <!-- AUTO-RELATIONS:BEGIN/END --> 自动块；块外手写内容由 update_content.py 保留）
+（英文正文结构（M2.5）：`<!-- SUMMARY:BEGIN/END -->`（机器生成简介，受管） → 手写区（保留） → `<!-- AUTO-RELATIONS:BEGIN/END -->`（关系/事实表，受管，含 ≤15 词"依据"短引）。两个受管块由 update_content.py 重写，块外手写内容保留）
 ```
 
 **硬性规则**：`type` ∈ 实体集；`predicate` ∈ 谓词集；每条 relation 必须有 `source`、`as_of`、`confidence`、`extractors`；`target` 必须能解析到一个实体 id（先过 `alias_map`）；`source` 必须解析到 `content/sources/` 下的来源页。
