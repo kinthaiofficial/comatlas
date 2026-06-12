@@ -51,3 +51,36 @@ def test_weak_model_silence_never_demotes():
     # claude+minimax agree (1 source) -> medium; a silent glirel must not change that
     by = merge_votes([edge(), edge(extractor="minimax")])
     assert score(by[KEY], True) == "medium"
+
+
+# ── M2b: functional-conflict detection (G12) ─────────────────────────────────
+from scripts.consensus import find_conflicts
+
+
+def test_subsidiary_of_is_always_functional_conflict():
+    by = merge_votes([
+        edge(subj="mellanox", pred="SUBSIDIARY_OF", tgt="nvidia", stype="Company"),
+        edge(subj="mellanox", pred="SUBSIDIARY_OF", tgt="intel", extractor="minimax", stype="Company")])
+    conflicts = find_conflicts(by)
+    assert len(conflicts) == 1 and conflicts[0]["subject"] == "mellanox"
+    assert {c["target"] for c in conflicts[0]["candidates"]} == {"nvidia", "intel"}
+
+
+def test_manufactured_by_company_subject_is_not_conflict():
+    by = merge_votes([
+        edge(subj="nvidia", pred="MANUFACTURED_BY", tgt="tsmc", stype="Company"),
+        edge(subj="nvidia", pred="MANUFACTURED_BY", tgt="samsung", stype="Company")])
+    assert find_conflicts(by) == []           # a company can use multiple foundries
+
+
+def test_manufactured_by_chip_subject_is_conflict():
+    by = merge_votes([
+        edge(subj="h100", pred="MANUFACTURED_BY", tgt="tsmc", stype="Chip"),
+        edge(subj="h100", pred="MANUFACTURED_BY", tgt="samsung", extractor="minimax", stype="Chip")])
+    assert len(find_conflicts(by)) == 1       # one chip is single-foundry (G12)
+
+
+def test_non_functional_predicate_never_conflicts():
+    by = merge_votes([edge(subj="nvidia", pred="COMPETES_WITH", tgt="amd"),
+                      edge(subj="nvidia", pred="COMPETES_WITH", tgt="intel")])
+    assert find_conflicts(by) == []           # competes_with is multi-valued

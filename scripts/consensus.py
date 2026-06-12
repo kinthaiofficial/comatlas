@@ -29,6 +29,35 @@ def merge_votes(edges: list[dict]) -> dict:
     return by
 
 
+# Functional predicates (G12): same subject must have a single target, so multiple distinct
+# targets are a conflict. SUBSIDIARY_OF is always functional; MANUFACTURED_BY only when the
+# subject is a Chip (a company/product can use several foundries — not a conflict).
+_FUNCTIONAL = {"SUBSIDIARY_OF": "always", "MANUFACTURED_BY": "chip"}
+
+
+def find_conflicts(by: dict) -> list[dict]:
+    """Detect functional-predicate conflicts among merged records (G12). Returns one item per
+    conflicting (subject, predicate) with its candidate targets — routed to the review queue."""
+    groups: dict = {}
+    for (subj, pred, _tgt), rec in by.items():
+        groups.setdefault((subj, pred), []).append(rec)
+    conflicts = []
+    for (subj, pred), recs in groups.items():
+        mode = _FUNCTIONAL.get(pred)
+        if mode is None:
+            continue
+        if len({r["key"][2] for r in recs}) < 2:
+            continue
+        if mode == "chip" and recs[0]["edge"].get("subject_type") != "Chip":
+            continue
+        conflicts.append({"subject": subj, "predicate": pred,
+                          "candidates": [{"target": r["key"][2],
+                                          "extractors": sorted(set(r["extractors"])),
+                                          "sources": sorted(r["sources"]),
+                                          "evidence": r["evidence"]} for r in recs]})
+    return conflicts
+
+
 def score(rec: dict, grounding_ok: bool) -> str:
     """M2 confidence (solution §5.2): structured → high; grounding failure → low; otherwise
     agreement (distinct extractors) + corroboration (distinct sources). Weak-model silence

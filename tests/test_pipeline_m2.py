@@ -93,3 +93,20 @@ def test_human_edge_published_despite_grounding_false(tmp_path, monkeypatch):
     r = _rel(tmp_path)
     assert r is not None and r["confidence"] != "low"    # human authoritative — grounding bypassed
     assert "human" in r["extractors"]
+
+
+def test_functional_conflict_routed_to_queue_not_published(tmp_path, monkeypatch):
+    claude = [{"subject": "Mellanox", "subject_type": "Company", "predicate": "SUBSIDIARY_OF",
+               "object": "NVIDIA", "object_type": "Company", "evidence": "Mellanox is part of NVIDIA.",
+               "as_of": "2026-Q1", "source": "nvda-10k-2026-02-26", "extractor": "claude"}]
+    minimax = [{"subject": "Mellanox", "subject_type": "Company", "predicate": "SUBSIDIARY_OF",
+                "object": "Intel", "object_type": "Company", "evidence": "Mellanox belongs to Intel.",
+                "as_of": "2026-Q1", "source": "nvda-10k-2026-02-26", "extractor": "minimax"}]
+    _setup(tmp_path, monkeypatch, claude, minimax)
+    pipe.run(today="2026-06-12")
+    mp = tmp_path / "content" / "entities" / "mellanox.md"
+    if mp.exists():
+        rels = frontmatter.load(mp).metadata.get("relations") or []
+        assert not any(r["predicate"] == "SUBSIDIARY_OF" for r in rels)   # conflicting edge not published
+    rq = (tmp_path / "review_queue.md").read_text()
+    assert "conflict" in rq and "SUBSIDIARY_OF" in rq                     # surfaced for human arbitration

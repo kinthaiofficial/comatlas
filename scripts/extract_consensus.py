@@ -97,7 +97,16 @@ def process_source(raw: dict, today: str) -> None:
                             "candidates": [{"target": e["target"], "extractors": e["extractors"],
                                             "sources": sorted(rec["sources"]), "evidence": rec["evidence"]}]})
 
+    # Functional-predicate conflicts (G12) → review queue; the conflicting edges are not published
+    conflicted = set()
+    for c in consensus.find_conflicts(by):
+        for cand in c["candidates"]:
+            conflicted.add((c["subject"], c["predicate"], cand["target"]))
+        queue_items.append({"kind": "conflict", **c})
+
     for rec in by.values():
+        if rec["key"] in conflicted:
+            continue                                          # already queued as a conflict; don't publish
         e = dict(rec["edge"])
         e["extractors"] = sorted(set(rec["extractors"]))      # union; human never relabeled (#8)
         anchored = bool(set(e["extractors"]) & ANCHOR_EXTRACTORS)
