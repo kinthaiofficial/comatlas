@@ -4,7 +4,7 @@ aliases:
 confidence: medium
 id: nvidia-compute-networking
 label: nvidia-compute-networking
-last_updated: '2026-06-08'
+last_updated: '2026-06-11'
 publish: true
 relations:
 - as_of: 2026-Q2
@@ -12,6 +12,7 @@ relations:
   corroborates:
   - nvda-10q-2026-05-20
   extractors:
+  - claude
   - xbrl
   predicate: IN_SEGMENT
   source: nvda-10k-2026-02-25

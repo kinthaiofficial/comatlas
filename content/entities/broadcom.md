@@ -4,7 +4,7 @@ aliases:
 confidence: medium
 id: broadcom
 label: broadcom
-last_updated: '2026-06-08'
+last_updated: '2026-06-11'
 publish: true
 relations: []
 sources:

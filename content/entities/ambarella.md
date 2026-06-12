@@ -1,9 +1,9 @@
 ---
 aliases:
-- marvell
+- Ambarella, Inc.
 confidence: medium
-id: marvell
-label: marvell
+id: ambarella
+label: Ambarella, Inc.
 last_updated: '2026-06-11'
 publish: true
 relations: []

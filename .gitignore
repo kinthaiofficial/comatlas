@@ -17,3 +17,6 @@ __pycache__/
 
 # Secrets
 .env*
+
+# transient anchor checkpoint files
+raw/_partial/

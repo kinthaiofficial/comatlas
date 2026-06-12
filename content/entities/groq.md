@@ -1,9 +1,9 @@
 ---
 aliases:
-- marvell
+- Groq, Inc.
 confidence: medium
-id: marvell
-label: marvell
+id: groq
+label: Groq, Inc.
 last_updated: '2026-06-11'
 publish: true
 relations: []

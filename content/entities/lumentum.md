@@ -1,9 +1,9 @@
 ---
 aliases:
-- marvell
+- Lumentum Holdings Inc.
 confidence: medium
-id: marvell
-label: marvell
+id: lumentum
+label: Lumentum Holdings Inc.
 last_updated: '2026-06-11'
 publish: true
 relations: []
