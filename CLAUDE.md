@@ -107,16 +107,19 @@ publish: true
 
 ## 5. 抽取与共识（核心流程）
 
-### 5.1 M1 实际运行（已上线）
+### 5.1 M2 实际运行（已上线）
 
-**M1 管线 = Claude 锚 + XBRL 确定性腿**（单票共识）。其余腿为 M2，尚未激活。
+**管线 = Claude 锚 + MiniMax 第二票 + XBRL/Wikidata 结构腿**（共识投票 + grounding + 锚门 + 复核队列）。
 
-- **锚 = Claude**：headless `claude -p`，走 **Claude Code 订阅**（本机已登录；GitHub Actions 用 `CLAUDE_CODE_OAUTH_TOKEN`，**不用** ANTHROPIC_API_KEY）。按本体做 schema 约束抽取，输出三元组 + 来源句。`extractors: [claude]`。
-  - **注意 quota**：`claude -p` 消耗订阅配额；不要与其他 claude 会话并发跑大规模抽取。
-- **XBRL 腿**：`edgartools` 解析财务事实（总收入、分部收入）→ 直接采信（高权威），`extractors: [xbrl]`。
-- **M1 打分（`score_m1`）**：结构化腿 → `high`；叙述腿（单 claude 票）→ `medium`。
-
-**M2 腿（尚未激活，计划中）**：MiniMax M3 第二票、GLiREL 佐证票、Wikidata SPARQL 结构化关系、grounding 证据校验、共识投票、复核队列自动写入。
+- **锚 = Claude**：headless `claude -p`（订阅；Actions 用 `CLAUDE_CODE_OAUTH_TOKEN`，**不用** API key）。**本地手动重算应用会话内 Claude 直接抽（不 shell `claude -p` 子进程——会与本会话抢订阅配额、自相限速）**，CI 隔离 runner 才用 `claude -p`。`extractors:[claude]`。
+- **第二票 = MiniMax M3**：`api.minimaxi.com/v1`，强制 `record_triples` tool_call。仅投票不当锚；越界/无效三元组丢弃；**逐块容错**（422 敏感内容/限速跳过该块）。`extractors:[minimax]`。
+- **XBRL 腿**：`edgartools` 财务事实 → 直接采信 high。`extractors:[xbrl]`。
+- **Wikidata 腿**：WDQS SPARQL（P355 子公司 / P1830 持股）→ 结构边；**印证现有实体**（subject+target 都已存在才入图，不引入新节点）；WDQS 故障容错跳过。`extractors:[wikidata]`。
+- **grounding = MiniMax M3**：rapidfuzz 证据存在性 + M3 蕴含判定（用供应链语义措辞、给原文上下文窗口）。
+- **锚门（关键）**：MiniMax/GLiREL 是票不是锚——无锚抽取器 `{claude,human,xbrl,wikidata}` 支持的边**绝不入图**，进 `review_queue.md`（kind=weak-only）。
+- **human / 结构边权威**：带 `human` 的人工 gold 与 XBRL/Wikidata 边**绕过 grounding**，不被 flaky 判定误降。
+- **函数型冲突（G12）→ review_queue（kind=conflict）**：不发布、不自动仲裁（GLiREL 未启用，冲突交人工）。
+- **打分（`consensus.score`）**：结构边→high；grounding 失败→low；否则 ≥2 抽取器且 ≥2 来源→high，≥1→medium。
 
 ### 5.2 共识规则（M2 生效后）
 1. **先归一化**：所有抽取输出映射到规范实体 id（过 `alias_map`）+ 规范谓词，**再**比对一致性。
@@ -148,12 +151,15 @@ def score_edge(edge, votes, sources):
 
 ### 5.3 当前管线命令
 ```bash
-python scripts/fetch_sources.py              # EDGAR 增量采集
-python scripts/extract_consensus.py          # 抽取（Claude 锚 + XBRL）+ 更新 content/
-python scripts/lint_frontmatter.py           # schema/来源/红线强制（exit 1 → 修复后才能提交）
-node scripts/build_graph.js                  # frontmatter → public/graph/graph.json
-npx quartz build                             # Quartz 渲染发布
+export MINIMAX_API_KEY=...                    # 第二票 + grounding（ops/.env；Actions 用 Secret）
+python scripts/fetch_sources.py               # EDGAR 增量采集
+python scripts/extract_consensus.py           # 锚+二票+结构腿 → 共识/grounding/锚门 → content/ + review_queue.md
+python scripts/lint_frontmatter.py            # schema/来源/红线强制（exit 1 → 修复后才能提交）
+node scripts/build_graph.js                   # frontmatter → public/graph/graph.json
+npx quartz build                              # Quartz 渲染发布
 ```
+- **自动维护**：`.github/workflows/maintain.yml`（手动 `workflow_dispatch`；需 `CLAUDE_CODE_OAUTH_TOKEN` + `MINIMAX_API_KEY` Secret）。跑通后再加 `schedule:` cron。
+- **本地重算存量**：会话内 Claude 抽取注入 + MiniMax 腿，见 `scripts/_recompute_m2.py`（审计记录）。
 
 ---
 
