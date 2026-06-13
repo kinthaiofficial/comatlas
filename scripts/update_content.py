@@ -13,6 +13,8 @@ AUTO_BEGIN = "<!-- AUTO-RELATIONS:BEGIN -->"
 AUTO_END = "<!-- AUTO-RELATIONS:END -->"
 SUMMARY_BEGIN = "<!-- SUMMARY:BEGIN -->"
 SUMMARY_END = "<!-- SUMMARY:END -->"
+INBOUND_BEGIN = "<!-- INBOUND:BEGIN -->"
+INBOUND_END = "<!-- INBOUND:END -->"
 RANK = {"low": 0, "medium": 1, "high": 2}
 
 
@@ -171,6 +173,46 @@ def _rewrite_summary(post: frontmatter.Post, text: str) -> str:
         _, tail = rest.split(SUMMARY_END, 1)
         return f"{head}{block}{tail}"
     return f"{block}\n\n{body}"
+
+
+def _render_inbound(rows: list, source_urls: dict) -> str:
+    """Render the 'Referenced by' table from (subject_id, predicate, source_id) rows."""
+    if not rows:
+        return "_No incoming relationships yet._"
+    out = ["**Referenced by**", "", "| from | relation | source |", "|---|---|---|"]
+    for subj, pred, src in rows:
+        out.append(f"| [[{subj}]] | {pred} | {_source_cell(src, source_urls)} |")
+    return "\n".join(out)
+
+
+def rebuild_inbound(content: Path) -> None:
+    """Scan every entity page's (outbound) relations and write each target an 'INBOUND' block
+    listing its incoming relationships with predicate. Makes target pages (competitors, foundries)
+    show their link to the graph instead of an empty table. Idempotent; low edges excluded (#3)."""
+    content = Path(content)
+    edir = content / "entities"
+    sources_dir = content / "sources"
+    source_urls = ({p.stem: (frontmatter.load(p).metadata.get("url") or "")
+                    for p in sources_dir.glob("*.md")} if sources_dir.is_dir() else {})
+    pages = {p.stem: frontmatter.load(p) for p in edir.glob("*.md")}
+    incoming: dict[str, list] = {eid: [] for eid in pages}
+    for sid, post in pages.items():
+        for r in post.metadata.get("relations") or []:
+            if r.get("confidence") == "low":
+                continue
+            if r["target"] in incoming:
+                incoming[r["target"]].append((sid, r["predicate"], r["source"]))
+    for eid, post in pages.items():
+        block = f"{INBOUND_BEGIN}\n{_render_inbound(sorted(incoming[eid]), source_urls)}\n{INBOUND_END}"
+        body = post.content
+        if INBOUND_BEGIN in body and INBOUND_END in body:
+            head, rest = body.split(INBOUND_BEGIN, 1)
+            _, tail = rest.split(INBOUND_END, 1)
+            body = f"{head}{block}{tail}"
+        else:
+            body = f"{body.rstrip()}\n\n{block}\n"
+        post.content = body
+        _dump(post, edir / f"{eid}.md")
 
 
 def apply(content: Path, *, edges: list, facts: list, source_meta: dict, today: str,

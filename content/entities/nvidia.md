@@ -359,3 +359,19 @@ NVIDIA is an accelerated-computing and AI-infrastructure company; per its FY2026
 | segment_revenue:nvidia-compute-networking | 193,479,000,000 USD | FY2026 | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
 | segment_revenue:nvidia-graphics | 22,459,000,000 USD | FY2026 | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
 <!-- AUTO-RELATIONS:END -->
+
+<!-- INBOUND:BEGIN -->
+**Referenced by**
+
+| from | relation | source |
+|---|---|---|
+| [[fabrinet]] | SUPPLIES | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[hon-hai]] | SUPPLIES | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[mellanox]] | SUBSIDIARY_OF | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[micron]] | SUPPLIES | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[nvidia-compute-networking]] | IN_SEGMENT | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[nvidia-graphics]] | IN_SEGMENT | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[samsung]] | SUPPLIES | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[sk-hynix]] | SUPPLIES | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+| [[wistron]] | SUPPLIES | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+<!-- INBOUND:END -->

@@ -148,6 +148,35 @@ SUMMARIES = {
         "Baidu operates cloud and AI services. NVIDIA's FY2026 10-K names it among cloud providers with internal "
         "silicon efforts that compete with NVIDIA."
     ),
+    # NVIDIA products / technologies described in the FY2026 10-K (Item 1)
+    "blackwell": (
+        "Blackwell is NVIDIA's data-center-scale architecture introduced in fiscal 2025, spanning GPUs, CPUs, "
+        "DPUs, interconnects and switch systems for generative-AI and accelerated-computing workloads, per the "
+        "FY2026 10-K."
+    ),
+    "blackwell-300": (
+        "Blackwell Ultra is the fiscal-2026 evolution of NVIDIA's Blackwell platform, optimized for agentic, "
+        "reasoning and physical AI; per the FY2026 10-K it delivers higher token throughput and lower cost per "
+        "token than the prior Hopper generation."
+    ),
+    "blackwell-workstation": (
+        "NVIDIA's Blackwell-generation RTX PRO GPUs bring the Blackwell architecture to professional workstations "
+        "for design, simulation and on-premises AI workloads, per the FY2026 10-K."
+    ),
+    "nvlink": (
+        "NVLink is NVIDIA's high-speed GPU interconnect; with NVLink switches it lets large numbers of GPUs act as "
+        "a single data-center-scale computer. The FY2026 10-K notes NVIDIA introduced NVLink Fusion to integrate "
+        "custom CPUs and XPUs with its platform."
+    ),
+    "infiniband": (
+        "InfiniBand is a high-performance data-center networking interconnect in NVIDIA's networking portfolio "
+        "(expanded via the Mellanox acquisition), offered as end-to-end platforms with adapters, cables, DPUs and "
+        "switches, per the FY2026 10-K."
+    ),
+    "spectrum-x-ethernet": (
+        "Spectrum-X is NVIDIA's Ethernet networking platform for AI data centers, part of its end-to-end "
+        "networking offerings alongside InfiniBand, per the FY2026 10-K."
+    ),
 }
 
 if __name__ == "__main__":

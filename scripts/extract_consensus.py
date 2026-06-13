@@ -169,6 +169,8 @@ def run(today: str | None = None) -> list[str]:
         st["processed"] = True
         state_path.write_text(json.dumps(state, indent=2, sort_keys=True))
         done.append(sid)
+    if done:                                                  # refresh inbound (reverse) blocks
+        update_content.rebuild_inbound(CONTENT)
     return done
 
 

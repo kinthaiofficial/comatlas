@@ -34,3 +34,11 @@ Graphics is one of NVIDIA's two reported operating segments, covering GeForce GP
 |---|---|---|---|---|---|
 | IN_SEGMENT | [[nvidia]] | 2026-Q2 | high | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm#:~:text=XBRL%20reportable%20segment%3A%20Graphics" target="_blank" rel="noopener">XBRL reportable segment: Graphics</a> | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
 <!-- AUTO-RELATIONS:END -->
+
+<!-- INBOUND:BEGIN -->
+**Referenced by**
+
+| from | relation | source |
+|---|---|---|
+| [[blackwell]] | IN_SEGMENT | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000052/nvda-20260426.htm" target="_blank" rel="noopener">nvda-10q-2026-05-20</a> |
+<!-- INBOUND:END -->

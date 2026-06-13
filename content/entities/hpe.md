@@ -21,3 +21,11 @@ Hewlett Packard Enterprise provides servers and networking. NVIDIA's FY2026 10-K
 | relation | target | as of | confidence | basis | source |
 |---|---|---|---|---|---|
 <!-- AUTO-RELATIONS:END -->
+
+<!-- INBOUND:BEGIN -->
+**Referenced by**
+
+| from | relation | source |
+|---|---|---|
+| [[nvidia]] | COMPETES_WITH | <a href="https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm" target="_blank" rel="noopener">nvda-10k-2026-02-25</a> |
+<!-- INBOUND:END -->

@@ -198,3 +198,28 @@ def test_source_external_newtab_and_basis_deeplink(tmp_path):
     assert 'href="https://x"' in auto          # source cell -> external SEC url
     assert "#:~:text=" in auto                  # basis cell -> text-fragment deep link
     assert "[[sources/" not in auto             # broken table-pipe wikilink is gone
+
+
+# ── M2.5+: inbound (reverse) relationships on every entity page ───────────────
+def test_rebuild_inbound_adds_incoming_block(tmp_path):
+    # nvidia COMPETES_WITH amd lives on nvidia's page; amd's page should show it as incoming
+    uc.apply(tmp_path, edges=[{**EDGE, "target": "amd", "predicate": "COMPETES_WITH",
+                               "target_label": "AMD", "evidence": "NVIDIA competes with AMD."}],
+             facts=[], source_meta=SRC, today="2026-06-13")
+    uc.rebuild_inbound(tmp_path)
+    amd = (tmp_path / "entities" / "amd.md").read_text()
+    assert "INBOUND:BEGIN" in amd
+    inbound = amd.split("INBOUND:BEGIN")[1].split("INBOUND:END")[0]
+    assert "nvidia" in inbound and "COMPETES_WITH" in inbound        # incoming edge shown with predicate
+
+
+def test_rebuild_inbound_excludes_low_and_is_idempotent(tmp_path):
+    uc.apply(tmp_path, edges=[{**EDGE, "target": "amd", "predicate": "COMPETES_WITH",
+                               "target_label": "AMD", "confidence": "low"}],
+             facts=[], source_meta=SRC, today="2026-06-13")
+    uc.rebuild_inbound(tmp_path)
+    uc.rebuild_inbound(tmp_path)                                      # twice -> byte-identical
+    amd = (tmp_path / "entities" / "amd.md").read_text()
+    inbound = amd.split("INBOUND:BEGIN")[1].split("INBOUND:END")[0]
+    assert "nvidia" not in inbound                                   # low edge not surfaced (red line #3)
+    assert amd.count("INBOUND:BEGIN") == 1                           # idempotent, single block
